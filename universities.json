@@ -1,0 +1,91 @@
+{
+  "version": "1.0.0",
+  "universities": [
+    {
+      "id": "rupp",
+      "name_en": "Royal University of Phnom Penh",
+      "name_km": "សាកលវិទ្យាល័យភូមិន្ទនភុទ្ធនោរមាសភ្នំពេញ",
+      "short_name": "RUPP",
+      "location": "Phnom Penh, Cambodia",
+      "website": "https://www.rupp.edu.kh",
+      "teaching_languages": ["Khmer", "English"],
+      "faculties": [
+        {
+          "name_en": "Faculty of Science",
+          "name_km": "វិទ្យាសាលាវិទ្យា",
+          "majors": [
+            {
+              "key": "computer_science",
+              "name_en": "Computer Science",
+              "name_km": "វិទ្យាសាស្ត្រកុំព្យូទ័រ",
+              "tuition_per_year_usd": 450,
+              "admission_requirements": ["High school certificate", "Passed national Year 12 examination", "Entrance or language tests"],
+              "scholarships": ["Merit-based scholarship", "Government scholarship"],
+              "related_majors": ["information_technology", "software_engineering", "data_science"]
+            },
+            {
+              "key": "information_technology",
+              "name_en": "Information Technology",
+              "name_km": "បច្ចេកទេសប្រើប្រាស់",
+              "tuition_per_year_usd": 450,
+              "admission_requirements": ["High school certificate", "Passed national Year 12 examination"],
+              "scholarships": ["Merit-based scholarship", "Government scholarship"],
+              "related_majors": ["computer_science", "software_engineering"]
+            },
+            {
+              "key": "mathematics",
+              "name_en": "Mathematics",
+              "name_km": "វិទ្យាសាស្ត្រគណិតវិទ្យា",
+              "tuition_per_year_usd": 250,
+              "admission_requirements": ["High school certificate", "Passed national Year 12 examination"],
+              "scholarships": ["Merit-based scholarship", "Government scholarship"],
+              "related_majors": ["statistics", "data_science"]
+            },
+            {
+              "key": "biology",
+              "name_en": "Biology",
+              "name_km": "វិទ្យាសាស្ត្រជីវវិទ្យា",
+              "tuition_per_year_usd": 300,
+              "admission_requirements": ["High school certificate", "Passed national Year 12 examination"],
+              "scholarships": ["Merit-based scholarship", "Government scholarship"],
+              "related_majors": ["biotechnology", "medicine", "public_health"]
+            },
+            {
+              "key": "chemistry",
+              "name_en": "Chemistry",
+              "name_km": "វិទ្យាសាស្ត្រវេជ្ជបណ្ឌិត",
+              "tuition_per_year_usd": 300,
+              "admission_requirements": ["High school certificate", "Passed national Year 12 examination"],
+              "scholarships": ["Merit-based scholarship", "Government scholarship"],
+              "related_majors": ["pharmacy", "biotechnology", "medicine"]
+            }
+          ]
+        },
+        {
+          "name_en": "Faculty of Engineering",
+          "name_km": "វិទ្យាសាលាវិស្វករ",
+          "majors": [
+            {
+              "key": "civil_engineering",
+              "name_en": "Civil Engineering",
+              "name_km": "វិស្វករទូទាំងសុខ",
+              "tuition_per_year_usd": 800,
+              "admission_requirements": ["High school certificate", "Passed national Year 12 examination"],
+              "scholarships": ["Merit-based scholarship", "Government scholarship"],
+              "related_majors": ["architectural_engineering", "mechanical_engineering"]
+            },
+            {
+              "key": "electrical_engineering",
+              "name_en": "Electrical Engineering",
+              "name_km": "វិស្វករអាជីស័យស្ថានីយ៍",
+              "tuition_per_year_usd": 800,
+              "admission_requirements": ["High school certificate", "Passed national Year 12 examination"],
+              "scholarships": ["Merit-based scholarship"],
+              "related_majors": ["mechanical_engineering", "software_engineering"]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

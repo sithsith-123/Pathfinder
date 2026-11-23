@@ -1,9 +1,14 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
-import { ArrowRight, ArrowLeft, CheckCircle2, Compass, Sparkles, TrendingUp, BrainCircuit, RotateCcw, BriefcaseBusiness, X } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import {
+  ArrowRight, ArrowLeft, Check, CheckCircle2,
+  ChevronDown, ExternalLink, GraduationCap, MapPin, RotateCcw, X,
+} from 'lucide-react';
 import { assessmentQuestions } from '@/data/questions-km';
 import { getAssessmentResults } from '@/lib/scoring';
+import { getStrongestInterests, riasecToInterestScores } from '@/lib/interest-mapping';
+import { majorNameToKey, matchMajorToUniversities, type UniversityMatch } from '@/lib/university-matching';
 import type { DimensionKey, Question, Screen } from '@/types/assessment';
 
 const TOTAL_QUESTIONS = assessmentQuestions.length;
@@ -16,62 +21,52 @@ const ANALYSIS_STEPS = [
 ] as const;
 const DIMENSION_ORDER: DimensionKey[] = ['R', 'I', 'A', 'S', 'E', 'C'];
 type ConfirmationIntent = 'close' | 'submit';
-function ConfirmationDialog({
-  intent,
-  onCancel,
-  onConfirm,
-}: {
-  intent: ConfirmationIntent;
-  onCancel: () => void;
-  onConfirm: () => void;
-}) {
-  const isSubmit = intent === 'submit';
 
+/* ─────────────────────────────────────────────
+   Confirmation Dialog
+───────────────────────────────────────────── */
+function ConfirmationDialog({
+  intent, onCancel, onConfirm,
+}: { intent: ConfirmationIntent; onCancel: () => void; onConfirm: () => void }) {
+  const isSubmit = intent === 'submit';
   return (
-    <div className="dialog-backdrop fixed inset-0 z-50 flex items-center justify-center bg-slate-950/45 p-4">
+    <div className="dialog-backdrop fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
       <section
         aria-labelledby="confirmation-title"
         aria-describedby="confirmation-description"
         aria-modal="true"
-        className="dialog-panel w-full max-w-md rounded-2xl border border-border bg-white p-6 shadow-2xl sm:p-7"
-        onKeyDown={(event) => {
-          if (event.key === 'Escape') onCancel();
-        }}
+        className="dialog-panel w-full max-w-md rounded-[12px] border border-border bg-white p-6 shadow-soft sm:p-7"
+        onKeyDown={(e) => { if (e.key === 'Escape') onCancel(); }}
         role="alertdialog"
       >
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h2 id="confirmation-title" className="text-xl font-semibold text-primary">
+            <h2 id="confirmation-title" className="text-lg font-semibold text-primary">
               {isSubmit ? 'បញ្ជាក់ការបញ្ជូនចម្លើយ' : 'ត្រឡប់ទៅទំព័រដើម?'}
             </h2>
-            <p id="confirmation-description" className="mt-3 text-sm leading-6 text-secondary">
+            <p id="confirmation-description" className="mt-2 text-sm leading-6 text-secondary">
               {isSubmit
                 ? 'តើអ្នកប្រាកដថាចង់បញ្ជូនចម្លើយទាំង ២០ របស់អ្នកមែនទេ?'
-                : 'ចម្លើយដែលអ្នកបានជ្រើសរើសនឹងត្រូវលុប។ តើអ្នកចង់បិទសំណួរ ហើយត្រឡប់ទៅទំព័រដើមមែនទេ?'}
+                : 'ចម្លើយដែលអ្នកបានជ្រើសរើសនឹងត្រូវលុប។ តើអ្នកចង់បិទ ហើយត្រឡប់ទៅទំព័រដើមមែនទេ?'}
             </p>
           </div>
           <button
-            type="button"
-            onClick={onCancel}
-            aria-label="បិទប្រអប់បញ្ជាក់"
-            className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-secondary transition-colors hover:bg-slate-100 hover:text-primary focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-200"
+            type="button" onClick={onCancel} aria-label="បិទ"
+            className="btn-ghost inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-[6px] text-secondary hover:bg-surface hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
           >
             <X className="h-4 w-4" />
           </button>
         </div>
-        <div className="mt-7 flex flex-wrap justify-end gap-3">
+        <div className="mt-6 flex flex-wrap justify-end gap-2">
           <button
-            type="button"
-            autoFocus
-            onClick={onCancel}
-            className="rounded-full border border-border px-4 py-2.5 text-sm font-medium text-primary transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-200"
+            type="button" autoFocus onClick={onCancel}
+            className="btn-ghost rounded-[8px] border border-border px-4 py-2 text-sm font-medium text-primary hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
           >
             បន្ត
           </button>
           <button
-            type="button"
-            onClick={onConfirm}
-            className="rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#102545] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-200"
+            type="button" onClick={onConfirm}
+            className="btn-primary rounded-[8px] bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
           >
             {isSubmit ? 'បញ្ជូនចម្លើយ' : 'បិទ ហើយត្រឡប់ទៅទំព័រដើម'}
           </button>
@@ -81,154 +76,351 @@ function ConfirmationDialog({
   );
 }
 
-function WelcomeScreen({ onStart }: { onStart: () => void }) {
+/* ─────────────────────────────────────────────
+   3D Book component (Stripe Press style)
+───────────────────────────────────────────── */
+function Book3D() {
   return (
-    <main className="screen-enter min-h-[100svh] bg-surface px-[clamp(12px,4vw,24px)] py-6 text-text sm:py-10">
-      <div className="mx-auto flex min-h-[calc(100svh-3rem)] max-w-5xl items-center justify-center">
-        <div className="w-full max-w-3xl rounded-2xl border border-border bg-white p-[clamp(20px,5vw,28px)] shadow-soft sm:rounded-[32px] sm:p-10 lg:p-14">
-          <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-border bg-slate-50 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.22em] text-primary">
-            <Compass className="h-3.5 w-3.5" />
-            PATHFINDER
+    <div className="book-scene">
+      {/* Dynamic blurred ground shadow */}
+      <div className="book-shadow" />
+
+      {/* 3D Book Volume */}
+      <div className="book-body">
+        {/* ── Front cover ── */}
+        <div className="book-face book-front">
+          <div className="relative flex h-full flex-col justify-between p-6 pl-8">
+            {/* Elegant debossed cover frame */}
+            <div className="pointer-events-none absolute inset-3 left-7 rounded-[4px] border border-amber-200/25" />
+
+            {/* Top header */}
+            <div className="flex items-center justify-between border-b border-amber-200/20 pb-3">
+              <span className="font-sans text-[10px] font-bold uppercase tracking-[0.25em] text-amber-100/90">
+                PATHFINDER
+              </span>
+              <span className="font-sans text-[9px] font-semibold tracking-wider text-amber-200/70">
+                ២០២៦
+              </span>
+            </div>
+
+            {/* Center: Graduation cap & main typography */}
+            <div className="flex flex-col items-center py-2 text-center">
+              {/* Graduation Cap Emblem */}
+              <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full border border-amber-200/30 bg-gradient-to-b from-amber-500/20 to-transparent p-3 shadow-inner">
+                <svg
+                  viewBox="0 0 80 80"
+                  className="h-14 w-14 drop-shadow-[0_4px_8px_rgba(0,0,0,0.3)]"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  {/* Cap diamond board */}
+                  <polygon
+                    points="40,10 74,26 40,40 6,26"
+                    fill="url(#cap-gradient)"
+                    stroke="rgba(255, 235, 200, 0.8)"
+                    strokeWidth="1.5"
+                  />
+                  {/* Skull cap base */}
+                  <path
+                    d="M20 33 L20 48 C20 57 60 57 60 48 L60 33 Z"
+                    fill="url(#cap-base)"
+                  />
+                  {/* Center cap button */}
+                  <circle cx="40" cy="25" r="3" fill="#ffe5b4" />
+                  {/* Tassel cord */}
+                  <path
+                    d="M40 25 Q 58 28 64 42"
+                    stroke="#ffe099"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    fill="none"
+                  />
+                  {/* Tassel fringe */}
+                  <rect x="61" y="42" width="7" height="15" rx="2" fill="#ffcf66" />
+                  <defs>
+                    <linearGradient id="cap-gradient" x1="6" y1="10" x2="74" y2="40" gradientUnits="userSpaceOnUse">
+                      <stop stopColor="#fff8eb" />
+                      <stop offset="0.6" stopColor="#f5ddb0" />
+                      <stop offset="1" stopColor="#d19c52" />
+                    </linearGradient>
+                    <linearGradient id="cap-base" x1="20" y1="33" x2="60" y2="57" gradientUnits="userSpaceOnUse">
+                      <stop stopColor="#f7e6c4" />
+                      <stop offset="1" stopColor="#b37c35" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </div>
+
+              {/* Title in MiSans Khmer Bold */}
+              <h3 className="font-sans text-[26px] font-bold tracking-tight text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]">
+                PATHFINDER
+              </h3>
+              <p className="mt-1 font-sans text-xs font-bold tracking-normal text-amber-100 drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]">
+                ស្វែងយល់ពីអនាគតរបស់អ្នក
+              </p>
+
+              {/* Divider line */}
+              <div className="my-3 h-[1px] w-12 bg-amber-200/40" />
+
+              <p className="max-w-[170px] font-sans text-[10px] font-medium leading-4 text-amber-100/80">
+                ការវាយតម្លៃចំណាប់អារម្មណ៍ ជំនាញសិក្សា និងមាគ៌ាអាជីព
+              </p>
+            </div>
+
+            {/* Bottom info */}
+            <div className="flex items-center justify-between border-t border-amber-200/20 pt-2.5 text-[8.5px] font-semibold uppercase tracking-wider text-amber-200/70">
+              <span>RIASEC METHOD</span>
+              <span>CAMBODIA</span>
+            </div>
           </div>
-
-          <h1 className="max-w-2xl text-3xl font-semibold leading-[1.75] tracking-normal text-primary sm:text-5xl sm:leading-[1.3]">
-            ស្គាល់ចំណាប់អារម្មណ៍ ស្វែងយល់ពីអនាគតរបស់អ្នក
-          </h1>
-
-          <p className="mt-5 max-w-2xl text-base leading-7 text-secondary sm:mt-6 sm:text-lg sm:leading-8">
-            ឆ្លើយសំណួរអំពីចំណាប់អារម្មណ៍ ចំណុចខ្លាំង និងគោលដៅរបស់អ្នក ដើម្បីស្វែងរកជំនាញសាកលវិទ្យាល័យ និងផ្លូវអាជីពដែលអាចសមស្របនឹងអ្នក។
-          </p>
-
-          <div className="mt-8 flex flex-wrap gap-4 text-sm text-secondary">
-            <div className="rounded-full border border-border bg-slate-50 px-3 py-2">២០ សំណួរ</div>
-            <div className="rounded-full border border-border bg-slate-50 px-3 py-2">ប្រហែល ៤–៦ នាទី</div>
-            <div className="rounded-full border border-border bg-slate-50 px-3 py-2">គ្មានចម្លើយត្រូវ ឬខុសទេ</div>
-          </div>
-
-          <button
-            onClick={onStart}
-            className="mt-10 inline-flex items-center gap-3 rounded-full bg-primary px-6 py-3.5 text-base font-semibold text-white transition hover:bg-[#102545] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-200"
-          >
-            ចាប់ផ្តើមការវាយតម្លៃ
-            <ArrowRight className="h-4 w-4" />
-          </button>
         </div>
+
+        {/* ── Back cover ── */}
+        <div className="book-face book-back">
+          <div className="relative flex h-full flex-col justify-between p-6 pr-8">
+            <div className="pointer-events-none absolute inset-3 right-7 rounded-[4px] border border-amber-200/20" />
+
+            <div className="text-center font-sans text-[9px] font-bold uppercase tracking-[0.2em] text-amber-200/70">
+              អំពីការវាយតម្លៃ
+            </div>
+
+            <div className="space-y-2 text-center font-sans text-[9.5px] leading-relaxed text-amber-100/85">
+              <p>
+                ឧបករណ៍ជំនួយស្វែងរកសាកលវិទ្យាល័យ និងជំនាញដែលស័ក្តិសមបំផុតជាមួយបុគ្គលិកលក្ខណៈរបស់អ្នក។
+              </p>
+              <p className="text-amber-200/70">
+                ផ្អែកលើការស្រាវជ្រាវ និងទិន្នន័យជាក់ស្តែងនៅកម្ពុជា។
+              </p>
+            </div>
+
+            {/* Barcode simulation */}
+            <div className="flex flex-col items-center gap-1.5">
+              <div className="flex h-7 w-28 items-end justify-center gap-[2px] rounded-[2px] bg-white/90 p-1">
+                {[3, 1, 4, 2, 1, 3, 2, 4, 1, 2, 3, 1, 4, 2, 3, 1, 2, 3, 1, 4, 2, 1].map((h, i) => (
+                  <span
+                    key={i}
+                    className="w-[2px] bg-slate-900"
+                    style={{ height: `${h * 20 + 20}%` }}
+                  />
+                ))}
+              </div>
+              <span className="font-mono text-[7px] tracking-widest text-amber-200/60">
+                ISBN 978-9924-9000-0-1
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Spine (Left face) ── */}
+        <div className="book-face book-spine">
+          <div className="relative flex h-full w-full flex-col items-center justify-between py-6">
+            <span className="font-mono text-[8px] font-bold tracking-widest text-amber-200/70">
+              2026
+            </span>
+
+            {/* Vertical spine title */}
+            <div
+              style={{
+                writingMode: 'vertical-rl',
+                textOrientation: 'mixed',
+                transform: 'rotate(180deg)',
+              }}
+              className="font-sans text-[11px] font-bold tracking-[0.22em] text-amber-100 drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]"
+            >
+              PATHFINDER · ស្វែងយល់ពីអនាគត
+            </div>
+
+            <GraduationCap className="h-4 w-4 text-amber-200/80 drop-shadow" />
+          </div>
+        </div>
+
+        {/* ── Page Block: Right Fore-edge with ribbon marker ── */}
+        <div className="book-face book-pages-right">
+          {/* Silk bookmark ribbon dangling from page edge */}
+          <div className="book-ribbon" />
+        </div>
+
+        {/* ── Page Block: Top Edge ── */}
+        <div className="book-face book-pages-top" />
+
+        {/* ── Page Block: Bottom Edge ── */}
+        <div className="book-face book-pages-bottom" />
       </div>
-    </main>
+    </div>
   );
 }
 
+/* ─────────────────────────────────────────────
+   Welcome Screen
+───────────────────────────────────────────── */
+function WelcomeScreen({ onStart }: { onStart: () => void }) {
+  return (
+    <div className="screen-enter min-h-[100svh] bg-surface">
+      <header className="site-header px-6 py-4 sm:px-10">
+        <span className="text-xs font-semibold uppercase tracking-widest text-secondary">Pathfinder</span>
+      </header>
+
+      <main className="min-h-[calc(100svh-57px)] px-6 py-10 sm:px-10 sm:py-16 lg:px-16">
+        <div className="mx-auto grid max-w-5xl items-center gap-10 lg:grid-cols-2 lg:gap-16">
+
+          {/* ── Left: hero text ── */}
+          <div>
+            <p className="hero-line mb-5 text-xs font-semibold uppercase tracking-widest text-accent">
+              ការវាយតម្លៃអាជីព
+            </p>
+
+            <h1 className="hero-line text-4xl font-bold leading-tight tracking-tight text-primary sm:text-5xl sm:leading-[1.15]">
+              ស្គាល់ចំណាប់អារម្មណ៍
+              <br />
+              <span className="text-accent">ស្វែងយល់ពីអនាគត</span>
+            </h1>
+
+            <p className="hero-line mt-5 max-w-xl text-base leading-7 text-secondary sm:text-lg sm:leading-8">
+              ឆ្លើយសំណួរអំពីចំណាប់អារម្មណ៍ ចំណុចខ្លាំង និងគោលដៅរបស់អ្នក
+              ដើម្បីស្វែងរកជំនាញសាកលវិទ្យាល័យ និងផ្លូវអាជីពដែលអាចសមស្របនឹងអ្នក។
+            </p>
+
+            <div className="hero-line mt-7 flex flex-wrap gap-5 text-sm text-secondary">
+              {['២០ សំណួរ', 'ប្រហែល ៤–៦ នាទី', 'គ្មានចម្លើយត្រូវ ឬខុស'].map((label) => (
+                <div key={label} className="flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+                  <span>{label}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="hero-line">
+              <button
+                onClick={onStart}
+                className="btn-primary mt-9 inline-flex items-center gap-3 rounded-[8px] bg-accent px-6 py-3.5 text-base font-semibold text-white hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+              >
+                ចាប់ផ្តើម
+                <ArrowRight className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+
+          {/* ── Right: 3D floating book ── */}
+          <div className="flex justify-center lg:justify-end">
+            <Book3D />
+          </div>
+
+        </div>
+      </main>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────
+   Assessment Screen — with slide transition
+───────────────────────────────────────────── */
 function AssessmentScreen({
-  question,
-  questionIndex,
-  total,
-  selected,
-  onSelect,
-  onBack,
-  onClose,
-  onNext,
-  isFirst,
-  isLast,
-  validationMessage,
-  confirmation,
-  onCancelConfirmation,
-  onConfirmConfirmation,
+  question, questionIndex, total, selected, onSelect,
+  onBack, onClose, onNext, isFirst, isLast,
+  validationMessage, confirmation, onCancelConfirmation, onConfirmConfirmation,
 }: {
-  question: Question;
-  questionIndex: number;
-  total: number;
-  selected: string[];
-  onSelect: (optionId: string) => void;
-  onBack: () => void;
-  onClose: () => void;
-  onNext: () => void;
-  isFirst: boolean;
-  isLast: boolean;
-  validationMessage?: string;
+  question: Question; questionIndex: number; total: number;
+  selected: string[]; onSelect: (id: string) => void;
+  onBack: () => void; onClose: () => void; onNext: () => void;
+  isFirst: boolean; isLast: boolean; validationMessage?: string;
   confirmation: ConfirmationIntent | null;
-  onCancelConfirmation: () => void;
-  onConfirmConfirmation: () => void;
+  onCancelConfirmation: () => void; onConfirmConfirmation: () => void;
 }) {
   const progress = ((questionIndex + 1) / total) * 100;
+  // Track slide key so each question gets a fresh enter animation
+  const [slideKey, setSlideKey] = useState(questionIndex);
+  useEffect(() => { setSlideKey(questionIndex); }, [questionIndex]);
 
   return (
-    <main className="screen-enter min-h-screen bg-surface px-4 py-8 text-text sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-4xl">
-        <div className="mb-6 grid grid-cols-[1fr_auto_auto] items-center gap-2 text-sm font-medium text-secondary">
-          <span>សំណួរ {questionIndex + 1} ក្នុងចំណោម {total}</span>
-          <span className="max-w-[40vw] truncate rounded-full border border-border bg-white px-3 py-1.5">{question.category}</span>
-          <button type="button" onClick={onClose} aria-label="បិទសំណួរ ហើយត្រឡប់ទៅទំព័រដើម" title="បិទ ហើយត្រឡប់ទៅទំព័រដើម" className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border bg-white text-secondary transition hover:border-accent/70 hover:text-primary focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-200">
-            <X className="h-4 w-4" />
-          </button>
+    <div className="min-h-screen bg-surface">
+      {/* Sticky header */}
+      <header className="site-header px-5 py-3 sm:px-8">
+        <div className="mx-auto flex max-w-3xl items-center justify-between gap-4">
+          <span className="text-xs font-semibold uppercase tracking-widest text-secondary">Pathfinder</span>
+          <div className="flex items-center gap-3">
+            <span className="tabular-nums text-xs text-secondary">{questionIndex + 1} / {total}</span>
+            <button
+              type="button" onClick={onClose} aria-label="បិទ"
+              className="btn-ghost inline-flex h-8 w-8 items-center justify-center rounded-[6px] text-secondary hover:bg-border hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
         </div>
+      </header>
 
-        <div className="h-2 overflow-hidden rounded-full bg-slate-200">
-          <div className="h-full rounded-full bg-primary transition-[width] duration-500 ease-out" style={{ width: `${progress}%` }} />
-        </div>
+      {/* Thin animated progress line */}
+      <div className="progress-track">
+        <div className="progress-fill" style={{ width: `${progress}%` }} />
+      </div>
 
-        <p className="mt-5 text-sm leading-6 text-secondary">សូមជ្រើសរើសចម្លើយដែលសមស្របបំផុតនឹងចំណូលចិត្តរបស់អ្នក។ ចម្លើយរបស់អ្នកមិនមានត្រូវ ឬខុសទេ។</p>
+      <main className="px-5 py-10 sm:px-8">
+        <div className="mx-auto max-w-3xl">
+          <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-accent">{question.category}</p>
 
-        <div className="mt-5 rounded-[30px] border border-border bg-white p-6 shadow-soft sm:p-8 lg:p-10">
-          <h2 className="text-2xl font-semibold tracking-tight text-primary sm:text-3xl">{question.prompt}</h2>
+          {/* Question card slides in with each new question */}
+          <div key={slideKey} className="question-enter rounded-[12px] border border-border bg-white p-6 shadow-card sm:p-8">
+            <h2 className="text-2xl font-bold leading-snug tracking-tight text-primary sm:text-3xl">{question.prompt}</h2>
+            <p className="mt-3 text-sm leading-6 text-secondary">
+              សូមជ្រើសរើសចម្លើយដែលសមស្របបំផុតនឹងចំណូលចិត្តរបស់អ្នក។
+            </p>
 
-          <div className="mt-8 grid gap-3">
-            {question.options.map((option) => {
-              const isSelected = selected.includes(option.id);
-              return (
-                <button
-                  key={option.id}
-                  type="button"
-                  onClick={() => onSelect(option.id)}
-                  className={`w-full rounded-2xl border p-4 text-left transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-200 ${
-                    isSelected
-                      ? 'border-primary bg-primary/5 shadow-sm ring-2 ring-primary/20'
-                      : 'border-border bg-white hover:border-accent/70 hover:bg-slate-50'
-                  }`}
-                  aria-pressed={isSelected}
-                >
-                  <div className="flex items-start gap-3">
-                    <div
-                      className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-[10px] font-semibold ${
-                        isSelected ? 'border-primary bg-primary text-white' : 'border-slate-300 bg-white text-slate-400'
-                      }`}
-                    >
-                      {isSelected ? '✓' : ''}
+            <div className="mt-7 grid gap-2.5">
+              {question.options.map((option, i) => {
+                const isSelected = selected.includes(option.id);
+                return (
+                  <button
+                    key={option.id}
+                    type="button"
+                    onClick={() => onSelect(option.id)}
+                    style={{ animationDelay: `${i * 45}ms` }}
+                    className={`option-btn w-full rounded-[8px] border p-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring ${
+                      isSelected
+                        ? 'border-accent bg-accent/5 shadow-sm option-btn-selected'
+                        : 'border-border bg-white hover:border-accent/40 hover:bg-surface'
+                    }`}
+                    aria-pressed={isSelected}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-[4px] border option-check ${
+                        isSelected ? 'border-accent bg-accent text-white option-check-selected' : 'border-border bg-white text-transparent'
+                      }`}>
+                        <Check className="h-3 w-3 stroke-[3]" />
+                      </div>
+                      <span className="text-sm font-medium leading-6 text-text sm:text-base">{option.label}</span>
                     </div>
-                    <span className="text-base font-medium leading-7 text-text">{option.label}</span>
-                  </div>
-                </button>
-              );
-            })}
+                  </button>
+                );
+              })}
+            </div>
+
+            {validationMessage ? (
+              <p className="mt-4 animate-[fade-up_300ms_ease_both] rounded-[8px] border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+                {validationMessage}
+              </p>
+            ) : null}
           </div>
 
-          {validationMessage ? (
-            <p className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
-              {validationMessage}
-            </p>
-          ) : null}
-
-          <div className="mt-8 flex items-center justify-between gap-4">
+          {/* Nav row */}
+          <div className="mt-6 flex items-center justify-between gap-4">
             <button
-              type="button"
-              onClick={onBack}
-              disabled={isFirst}
-              className="inline-flex items-center gap-2 rounded-full border border-border bg-white px-4 py-2.5 text-sm font-medium text-primary transition hover:border-accent/70 disabled:cursor-not-allowed disabled:opacity-40"
+              type="button" onClick={onBack} disabled={isFirst}
+              className="btn-ghost inline-flex items-center gap-2 rounded-[8px] border border-border bg-white px-4 py-2.5 text-sm font-medium text-primary hover:bg-surface disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
             >
               <ArrowLeft className="h-4 w-4" />
-                      ត្រឡប់ក្រោយ
+              ត្រឡប់ក្រោយ
             </button>
-
             <button
-              type="button"
-              onClick={onNext}
-              className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#102545] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-200"
+              type="button" onClick={onNext}
+              className="btn-primary inline-flex items-center gap-2 rounded-[8px] bg-primary px-5 py-2.5 text-sm font-semibold text-white hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
             >
-                      {isLast ? 'បញ្ជូនចម្លើយ' : 'បន្ទាប់'}
-              {!isLast ? <ArrowRight className="h-4 w-4" /> : <CheckCircle2 className="h-4 w-4" />}
+              {isLast ? 'បញ្ជូនចម្លើយ' : 'បន្ទាប់'}
+              {!isLast ? <ArrowRight className="h-4 w-4" /> : <Check className="h-4 w-4" />}
             </button>
           </div>
         </div>
-      </div>
+      </main>
+
       {confirmation ? (
         <ConfirmationDialog
           intent={confirmation}
@@ -236,10 +428,13 @@ function AssessmentScreen({
           onConfirm={onConfirmConfirmation}
         />
       ) : null}
-    </main>
+    </div>
   );
 }
 
+/* ─────────────────────────────────────────────
+   Analysis Screen
+───────────────────────────────────────────── */
 function AnalysisScreen() {
   const [activeStep, setActiveStep] = useState(0);
 
@@ -250,58 +445,201 @@ function AnalysisScreen() {
         return prev + 1;
       });
     }, 700);
-
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <main className="screen-enter min-h-screen bg-surface px-4 py-8 text-text sm:px-6 lg:px-8">
-      <div className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-3xl items-center justify-center">
-        <div className="w-full rounded-[32px] border border-border bg-white p-8 text-center shadow-soft sm:p-10">
-          <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-primary/5 text-primary">
-            <Sparkles className="h-8 w-8 animate-pulse" />
-          </div>
-          <h2 className="text-3xl font-semibold tracking-tight text-primary">កំពុងរៀបចំលទ្ធផលរបស់អ្នក...</h2>
-          <p className="mt-4 text-base leading-7 text-secondary">
-            យើងកំពុងគណនាពិន្ទុតាមចម្លើយរបស់អ្នក និងរៀបចំជម្រើសជំនាញសិក្សា និងអាជីពដែលពាក់ព័ន្ធ។
+    <div className="screen-enter min-h-screen bg-surface">
+      <header className="site-header px-6 py-4 sm:px-10">
+        <span className="text-xs font-semibold uppercase tracking-widest text-secondary">Pathfinder</span>
+      </header>
+
+      <main className="flex min-h-[calc(100vh-57px)] items-center px-6 py-12 sm:px-10">
+        <div className="mx-auto w-full max-w-sm">
+          <div className="mb-8 spinner" />
+          <h2 className="text-2xl font-bold tracking-tight text-primary">កំពុងរៀបចំលទ្ធផល…</h2>
+          <p className="mt-3 text-sm leading-6 text-secondary">
+            យើងកំពុងគណនាពិន្ទុ និងរៀបចំជម្រើសសម្រាប់អ្នក។
           </p>
 
-          <div className="mt-8 space-y-4 text-left">
-            {ANALYSIS_STEPS.map((step, index) => (
-              <div key={step} className="flex items-center gap-3">
+          <div className="mt-8 space-y-3">
+            {ANALYSIS_STEPS.map((step, index) => {
+              const isDone = index < activeStep;
+              const isActive = index === activeStep;
+              return (
                 <div
-                  className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold ${
-                    index <= activeStep ? 'bg-primary text-white' : 'bg-slate-100 text-slate-500'
-                  }`}
+                  key={step}
+                  className="flex items-center gap-3"
+                  style={{ opacity: index <= activeStep ? 1 : 0.35, transition: 'opacity 400ms ease' }}
                 >
-                  {index <= activeStep ? '✓' : index + 1}
+                  <div className={`step-dot flex h-6 w-6 items-center justify-center rounded-[4px] text-xs font-semibold ${
+                    isDone || isActive ? 'bg-accent text-white' : 'bg-border text-secondary'
+                  } ${isActive ? 'step-dot-active' : ''}`}>
+                    {isDone ? <Check className="h-3 w-3 stroke-[3]" /> : index + 1}
+                  </div>
+                  <span className={`step-label text-sm ${isDone || isActive ? 'font-semibold text-primary' : 'text-secondary'}`}>
+                    {step}
+                  </span>
                 </div>
-                <span className={index <= activeStep ? 'font-medium text-primary' : 'text-secondary'}>{step}</span>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
-          <div className="mt-8 h-2 overflow-hidden rounded-full bg-slate-200">
+          {/* Mini progress bar */}
+          <div className="progress-track mt-8">
             <div
-              className="h-full rounded-full bg-primary transition-[width] duration-700 ease-out"
+              className="progress-fill"
               style={{ width: `${((activeStep + 1) / ANALYSIS_STEPS.length) * 100}%` }}
             />
           </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </div>
   );
 }
 
+/* ─────────────────────────────────────────────
+   University Card
+───────────────────────────────────────────── */
+function UniversityCard({ match }: { match: UniversityMatch }) {
+  const { university, faculty, major, matchType } = match;
+  const isExact = matchType === 'exact';
+  const tuition = typeof major.tuition_per_year_usd === 'number'
+    ? new Intl.NumberFormat('en-US').format(major.tuition_per_year_usd)
+    : null;
+  const admissionRequirements = major.admission_requirements ?? [];
+  const scholarships = major.scholarships ?? [];
+  const teachingLanguages = university.teaching_languages ?? [];
+
+  return (
+    <article className="flex min-w-0 flex-col rounded-[12px] border border-border bg-surface p-5 transition-shadow duration-200 hover:shadow-card">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <h4 className="break-words text-base font-semibold text-primary">{university.name_en}</h4>
+          <p className="mt-0.5 break-words text-sm text-secondary">{university.name_km}</p>
+        </div>
+        <span className={`badge-pop shrink-0 whitespace-nowrap rounded-[6px] px-2 py-1 text-xs font-semibold ${
+          isExact ? 'bg-accent/10 text-accent' : 'border border-border bg-white text-secondary'
+        }`}>
+          {isExact ? 'ជំនាញដូចគ្នា' : 'ជំនាញជិតស្និទ្ធ'}
+        </span>
+      </div>
+
+      <div className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-secondary">
+        <span className="inline-flex items-center gap-1.5">
+          <MapPin className="h-3.5 w-3.5 shrink-0" />
+          {university.location}
+        </span>
+        {university.short_name ? <span className="font-medium text-primary">{university.short_name}</span> : null}
+      </div>
+
+      <dl className="mt-4 space-y-1.5 text-sm">
+        <div className="flex flex-wrap gap-x-2">
+          <dt className="font-semibold text-primary">មហាវិទ្យាល័យ៖</dt>
+          <dd className="min-w-0 break-words text-secondary">{faculty.name_km}</dd>
+        </div>
+        <div className="flex flex-wrap gap-x-2">
+          <dt className="font-semibold text-primary">ជំនាញ៖</dt>
+          <dd className="min-w-0 break-words text-secondary">{major.name_km} ({major.name_en})</dd>
+        </div>
+        <div className="flex flex-wrap gap-x-2">
+          <dt className="font-semibold text-primary">ថ្លៃសិក្សាប្រចាំឆ្នាំ៖</dt>
+          <dd className="tabular-nums font-medium text-text">{tuition ? `${tuition} USD` : 'មិនមានទិន្នន័យ'}</dd>
+        </div>
+        {teachingLanguages.length > 0 ? (
+          <div className="flex flex-wrap gap-x-2">
+            <dt className="font-semibold text-primary">ភាសាបង្រៀន៖</dt>
+            <dd className="min-w-0 text-secondary">{teachingLanguages.join(' · ')}</dd>
+          </div>
+        ) : null}
+      </dl>
+
+      <div className="mt-4">
+        <h5 className="text-sm font-semibold text-primary">តម្រូវការចូលរៀន</h5>
+        {admissionRequirements.length > 0 ? (
+          <ul className="mt-2 space-y-1.5 text-sm leading-6 text-secondary">
+            {admissionRequirements.map((req, i) => (
+              <li key={`${i}-${req}`} className="flex items-start gap-2">
+                <CheckCircle2 className="mt-1 h-3.5 w-3.5 shrink-0 text-success" />
+                <span className="min-w-0 break-words">{req}</span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="mt-2 text-sm text-secondary">មិនមានទិន្នន័យ</p>
+        )}
+      </div>
+
+      {scholarships.length > 0 ? (
+        <div className="mt-4">
+          <h5 className="text-sm font-semibold text-primary">អាហារូបកម្ម</h5>
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {scholarships.map((s, i) => (
+              <span key={`${i}-${s}`} className="rounded-[6px] border border-border bg-white px-2.5 py-1 text-xs text-secondary">
+                {s}
+              </span>
+            ))}
+          </div>
+        </div>
+      ) : null}
+
+      <p className="mt-4 text-sm leading-6 text-secondary">
+        <span className="font-semibold text-primary">ហេតុអ្វីសមស្រប៖</span>{' '}
+        {isExact
+          ? 'សាលានេះផ្តល់ជូនជំនាញដែលបានណែនាំដោយផ្ទាល់។'
+          : 'សាលានេះផ្តល់ជូនជំនាញជិតស្និទ្ធជាមួយជំនាញដែលបានណែនាំ។'}
+      </p>
+
+      {university.website ? (
+        <div className="mt-auto pt-4">
+          <a
+            href={university.website} target="_blank" rel="noopener noreferrer"
+            className="btn-ghost inline-flex items-center gap-2 rounded-[8px] border border-border bg-white px-4 py-2 text-sm font-medium text-primary transition-colors hover:border-accent/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+          >
+            ទៅកាន់គេហទំព័រផ្លូវការ
+            <ExternalLink className="h-3.5 w-3.5" />
+          </a>
+        </div>
+      ) : null}
+    </article>
+  );
+}
+
+/* ─────────────────────────────────────────────
+   Animated bar fill hook
+───────────────────────────────────────────── */
+function useBarAnimation(value: number, delay = 0) {
+  const [width, setWidth] = useState(0);
+  useEffect(() => {
+    const t = setTimeout(() => setWidth(value), delay + 80);
+    return () => clearTimeout(t);
+  }, [value, delay]);
+  return width;
+}
+
+/* ─────────────────────────────────────────────
+   Results Screen
+───────────────────────────────────────────── */
 function ResultsScreen({ result, onRetake }: { result: ReturnType<typeof getAssessmentResults>; onRetake: () => void }) {
   const radarLevels = [20, 40, 60, 80, 100];
+  const [selectedMajorName, setSelectedMajorName] = useState<string | null>(null);
+  const universitySectionRef = useRef<HTMLElement>(null);
+
+  // Animate radar polygon draw-on
+  const [radarVisible, setRadarVisible] = useState(false);
+  useEffect(() => { const t = setTimeout(() => setRadarVisible(true), 400); return () => clearTimeout(t); }, []);
+
   const labelMap: Record<DimensionKey, string> = {
-    R: 'ការងារជាក់ស្តែង',
-    I: 'ការស្រាវជ្រាវ',
-    A: 'ការច្នៃប្រឌិត',
-    S: 'ការជួយអ្នកដទៃ',
-    E: 'ភាពជាអ្នកដឹកនាំ',
-    C: 'ការរៀបចំប្រព័ន្ធ',
+    R: 'ការងារជាក់ស្តែង', I: 'ការស្រាវជ្រាវ', A: 'ការច្នៃប្រឌិត',
+    S: 'ការជួយអ្នកដទៃ', E: 'ភាពជាអ្នកដឹកនាំ', C: 'ការរៀបចំប្រព័ន្ធ',
+  };
+  const interestLabels: Record<string, string> = {
+    technology: 'បច្ចេកវិទ្យា', mathematics: 'គណិតវិទ្យា',
+    analytical_problem_solving: 'ការវិភាគបញ្ហា', biology: 'ជីវវិទ្យា',
+    chemistry: 'គីមីវិទ្យា', healthcare: 'សុខភាព', communication: 'ការទំនាក់ទំនង',
+    creativity: 'ភាពច្នៃប្រឌិត', business: 'អាជីពពាណិជ្ជកម្ម',
+    social_interaction: 'ការងារសង្គម', engineering: 'វិស្វកម្ម',
+    science: 'វិទ្យាសាស្ត្រ', agriculture: 'កសិកម្ម', environment: 'បរិស្ថាន',
   };
   const dimensionDescriptions: Record<DimensionKey, string> = {
     R: 'ពិន្ទុនេះឆ្លុះបញ្ចាំងពីចំណាប់អារម្មណ៍លើការអនុវត្ត ការបង្កើត និងលទ្ធផលជាក់ស្តែង។',
@@ -313,228 +651,344 @@ function ResultsScreen({ result, onRetake }: { result: ReturnType<typeof getAsse
   };
 
   const radarPoints = useMemo(() => {
-    const centerX = 160;
-    const centerY = 160;
-    const radius = 120;
-
-    return DIMENSION_ORDER
-      .map((key, index) => {
-        const angle = (Math.PI * 2 * index) / DIMENSION_ORDER.length - Math.PI / 2;
-        const normalized = result.normalizedScores[key] / 100;
-        const distance = radius * normalized;
-        const x = centerX + Math.cos(angle) * distance;
-        const y = centerY + Math.sin(angle) * distance;
-        return `${x},${y}`;
-      })
-      .join(' ');
+    const cx = 160, cy = 160, r = 120;
+    return DIMENSION_ORDER.map((key, i) => {
+      const angle = (Math.PI * 2 * i) / DIMENSION_ORDER.length - Math.PI / 2;
+      const d = r * (result.normalizedScores[key] / 100);
+      return `${cx + Math.cos(angle) * d},${cy + Math.sin(angle) * d}`;
+    }).join(' ');
   }, [result.normalizedScores]);
 
+  const interestScores = useMemo(() => riasecToInterestScores(result.normalizedScores), [result.normalizedScores]);
+  const strongestInterests = useMemo(() => getStrongestInterests(interestScores, 3), [interestScores]);
+  const selectedMajor = selectedMajorName
+    ? result.majorRecommendations.find((m) => m.nameEnglish === selectedMajorName) ?? null
+    : null;
+  const universityMatches = useMemo(
+    () => (selectedMajor ? matchMajorToUniversities(majorNameToKey(selectedMajor.nameEnglish)) : []),
+    [selectedMajor],
+  );
+
+  const toggleMajor = (name: string) => setSelectedMajorName((cur) => (cur === name ? null : name));
+
+  useEffect(() => {
+    if (!selectedMajorName || !universitySectionRef.current) return;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    universitySectionRef.current.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'nearest' });
+  }, [selectedMajorName]);
+
   return (
-    <main className="screen-enter min-h-screen bg-surface px-4 py-8 text-text sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-6xl space-y-8">
-        <section className="rounded-[30px] border border-border bg-white p-6 shadow-soft sm:p-8">
-          <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-accent">លទ្ធផលរបស់អ្នករួចរាល់ហើយ</p>
-              <h2 className="mt-3 text-3xl font-semibold tracking-tight text-primary sm:text-4xl">ការណែនាំពី PATHFINDER</h2>
+    <div className="screen-enter min-h-screen bg-surface">
+      {/* Header */}
+      <header className="site-header px-6 py-4 sm:px-10">
+        <div className="mx-auto flex max-w-6xl items-center justify-between">
+          <span className="text-xs font-semibold uppercase tracking-widest text-secondary">Pathfinder</span>
+          <button
+            onClick={onRetake}
+            className="btn-ghost inline-flex items-center gap-2 rounded-[8px] border border-border bg-white px-3 py-2 text-sm font-medium text-primary transition hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+          >
+            <RotateCcw className="h-3.5 w-3.5" />
+            ធ្វើម្តងទៀត
+          </button>
+        </div>
+      </header>
+
+      <main className="px-5 py-10 sm:px-8 sm:py-12">
+        <div className="mx-auto max-w-6xl space-y-6">
+
+          {/* ── Hero ── */}
+          <section className="section-enter rounded-[12px] border border-border bg-white p-6 sm:p-8">
+            <p className="text-xs font-semibold uppercase tracking-widest text-accent">លទ្ធផលរបស់អ្នករួចរាល់ហើយ</p>
+            <h2 className="mt-3 text-3xl font-bold tracking-tight text-primary sm:text-4xl">ការណែនាំ PATHFINDER</h2>
+            <p className="mt-4 max-w-3xl text-sm leading-7 text-secondary">
+              លទ្ធផលនេះផ្អែកលើចម្លើយដែលអ្នកបានជ្រើសរើស ហើយបង្ហាញជម្រើសជំនាញសិក្សា និងអាជីពសម្រាប់ស្វែងយល់បន្ថែម។
+              វាជាព័ត៌មានណែនាំ មិនមែនជាការសម្រេចចិត្តជំនួសអ្នកទេ។
+            </p>
+          </section>
+
+          {/* ── Radar + Top Dimensions ── */}
+          <section className="grid gap-6 lg:grid-cols-[1.3fr_0.7fr]">
+            {/* Radar */}
+            <div className="section-enter rounded-[12px] border border-border bg-white p-6 sm:p-8" style={{ animationDelay: '80ms' }}>
+              <h3 className="mb-1 text-lg font-semibold text-primary">ទម្រង់ចំណាប់អារម្មណ៍</h3>
+              <p className="mb-6 text-sm leading-6 text-secondary">{result.profileSummary}</p>
+
+              <div className="grid gap-6 xl:grid-cols-[1fr_200px]">
+                {/* SVG radar with animated polygon */}
+                <svg viewBox="0 0 320 320" className="mx-auto w-full max-w-[280px]">
+                  {radarLevels.map((level) => {
+                    const pts = DIMENSION_ORDER.map((_, i) => {
+                      const angle = (Math.PI * 2 * i) / DIMENSION_ORDER.length - Math.PI / 2;
+                      const rr = (level / 100) * 120;
+                      return `${160 + Math.cos(angle) * rr},${160 + Math.sin(angle) * rr}`;
+                    }).join(' ');
+                    return <polygon key={level} points={pts} fill="none" stroke="#e2ddd8" strokeWidth="1" />;
+                  })}
+                  {DIMENSION_ORDER.map((key, i) => {
+                    const angle = (Math.PI * 2 * i) / DIMENSION_ORDER.length - Math.PI / 2;
+                    const x = 160 + Math.cos(angle) * 120;
+                    const y = 160 + Math.sin(angle) * 120;
+                    const lx = 160 + Math.cos(angle) * 142;
+                    const ly = 160 + Math.sin(angle) * 142;
+                    return (
+                      <g key={key}>
+                        <line x1="160" y1="160" x2={x} y2={y} stroke="#e2ddd8" strokeWidth="1" />
+                        <text x={lx} y={ly} textAnchor="middle" dominantBaseline="middle" fill="#1a1a2e" fontSize="12" fontWeight="600">{key}</text>
+                      </g>
+                    );
+                  })}
+                  {/* Animated polygon */}
+                  <polygon
+                    points={radarPoints}
+                    stroke="#c0622f"
+                    strokeWidth="2"
+                    fill="rgba(192,98,47,0.15)"
+                    style={{
+                      transition: 'opacity 800ms ease, fill-opacity 800ms ease',
+                      opacity: radarVisible ? 1 : 0,
+                      fillOpacity: radarVisible ? 1 : 0,
+                    }}
+                  />
+                </svg>
+
+                {/* Bars animate in with delays */}
+                <div className="space-y-2.5">
+                  {DIMENSION_ORDER.map((key, idx) => (
+                    <AnimatedBar key={key} label={labelMap[key]} value={result.normalizedScores[key]} delay={idx * 80} />
+                  ))}
+                </div>
+              </div>
             </div>
-            <button
-              onClick={onRetake}
-              className="inline-flex items-center gap-2 rounded-full border border-border bg-slate-50 px-4 py-2.5 text-sm font-medium text-primary transition hover:border-accent/70"
-            >
-              <RotateCcw className="h-4 w-4" />
-              ធ្វើការវាយតម្លៃម្តងទៀត
-            </button>
-          </div>
 
-          <p className="mt-5 max-w-3xl text-base leading-7 text-secondary">
-            លទ្ធផលនេះផ្អែកលើចម្លើយដែលអ្នកបានជ្រើសរើស ហើយបង្ហាញជម្រើសជំនាញសិក្សា និងអាជីពមួយចំនួនសម្រាប់ស្វែងយល់បន្ថែម។ វាជាព័ត៌មានណែនាំ មិនមែនជាការសម្រេចចិត្តជំនួសអ្នកអំពីអនាគតរបស់អ្នកទេ។
-          </p>
-        </section>
-
-        <section className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-          <div className="rounded-[30px] border border-border bg-white p-6 shadow-soft sm:p-8">
-            <div className="mb-4 flex items-center gap-3">
-              <TrendingUp className="h-5 w-5 text-primary" />
-              <h3 className="text-xl font-semibold text-primary">ទម្រង់ចំណាប់អារម្មណ៍</h3>
-            </div>
-            <p className="mb-5 text-sm leading-6 text-secondary">{result.profileSummary}</p>
-
-            <div className="grid gap-6 xl:grid-cols-[1fr_220px]">
-              <svg viewBox="0 0 320 320" className="mx-auto w-full max-w-[320px]">
-                {radarLevels.map((level) => {
-                  const points = DIMENSION_ORDER
-                    .map((key, index) => {
-                      const angle = (Math.PI * 2 * index) / DIMENSION_ORDER.length - Math.PI / 2;
-                      const radius = ((level / 100) * 120);
-                      const x = 160 + Math.cos(angle) * radius;
-                      const y = 160 + Math.sin(angle) * radius;
-                      return `${x},${y}`;
-                    })
-                    .join(' ');
-                  return <polygon key={level} points={points} fill="none" stroke="#E5E9F0" strokeWidth="1" />;
-                })}
-                {DIMENSION_ORDER.map((key, index) => {
-                  const angle = (Math.PI * 2 * index) / DIMENSION_ORDER.length - Math.PI / 2;
-                  const x = 160 + Math.cos(angle) * 120;
-                  const y = 160 + Math.sin(angle) * 120;
-                  const labelX = 160 + Math.cos(angle) * 142;
-                  const labelY = 160 + Math.sin(angle) * 142;
-                  return (
-                    <g key={key}>
-                      <line x1="160" y1="160" x2={x} y2={y} stroke="#E5E9F0" strokeWidth="1" />
-                      <text x={labelX} y={labelY} textAnchor="middle" dominantBaseline="middle" fill="#172B4D" fontSize="12" fontWeight="600">
-                        {key}
-                      </text>
-                    </g>
-                  );
-                })}
-                <polygon points={radarPoints} fill="rgba(71,121,209,0.22)" stroke="#4779D1" strokeWidth="2" />
-              </svg>
-
-              <div className="space-y-3">
-                {DIMENSION_ORDER.map((key) => (
-                  <div key={key} className="rounded-2xl border border-border bg-slate-50 p-3">
-                    <div className="mb-2 flex items-center justify-between gap-3 text-sm">
-                      <span className="font-semibold text-primary">{labelMap[key]}</span>
-                      <span className="font-medium text-secondary">{result.normalizedScores[key]}%</span>
+            {/* Top dimensions */}
+            <div className="section-enter rounded-[12px] border border-border bg-white p-6 sm:p-8" style={{ animationDelay: '140ms' }}>
+              <h3 className="mb-5 text-lg font-semibold text-primary">ចំណុចដែលមានពិន្ទុខ្ពស់</h3>
+              <div className="stagger-children space-y-3">
+                {result.topDimensions.map((key, index) => (
+                  <div key={key} className="rounded-[8px] border border-border bg-surface p-4">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold tabular-nums text-accent">#{index + 1}</span>
+                      <span className="text-sm font-semibold text-primary">{labelMap[key]}</span>
                     </div>
-                    <div className="h-2 overflow-hidden rounded-full bg-slate-200">
-                      <div className="h-full rounded-full bg-accent" style={{ width: `${result.normalizedScores[key]}%` }} />
-                    </div>
+                    <p className="mt-2 text-sm leading-6 text-secondary">{dimensionDescriptions[key]}</p>
                   </div>
                 ))}
               </div>
             </div>
-          </div>
+          </section>
 
-          <div className="rounded-[30px] border border-border bg-white p-6 shadow-soft sm:p-8">
-            <div className="mb-4 flex items-center gap-3">
-              <BrainCircuit className="h-5 w-5 text-primary" />
-              <h3 className="text-xl font-semibold text-primary">ចំណុចដែលមានពិន្ទុខ្ពស់</h3>
+          {/* ── Majors ── */}
+          <section className="section-enter rounded-[12px] border border-border bg-white p-6 sm:p-8" style={{ animationDelay: '200ms' }}>
+            <h3 className="text-lg font-semibold text-primary">ជំនាញសាកលវិទ្យាល័យដែលបានណែនាំ ១០</h3>
+            <p className="mt-1 mb-6 text-sm leading-6 text-secondary">
+              ជ្រើសរើសជំនាញមួយដើម្បីមើលសាកលវិទ្យាល័យ ថ្លៃសិក្សា និងតម្រូវការចូលរៀន។
+            </p>
+            <div className="grid gap-3 xl:grid-cols-2">
+              {result.majorRecommendations.map((major, index) => {
+                const isSelected = selectedMajorName === major.nameEnglish;
+                return (
+                  <article
+                    key={major.name}
+                    style={{ animationDelay: `${200 + index * 40}ms` }}
+                    className={`recommendation-card cursor-pointer rounded-[12px] border p-5 ${
+                      isSelected ? 'border-accent bg-accent/5' : 'border-border bg-surface'
+                    }`}
+                    role="button" tabIndex={0}
+                    aria-expanded={isSelected}
+                    onClick={() => toggleMajor(major.nameEnglish)}
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleMajor(major.nameEnglish); } }}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <h4 className="text-base font-semibold text-primary">{major.name}</h4>
+                        <p className="mt-0.5 text-sm text-secondary">{major.nameEnglish}</p>
+                      </div>
+                      <span className="shrink-0 rounded-[6px] bg-accent/10 px-2.5 py-1 text-xs font-semibold text-accent">{major.alignment}</span>
+                    </div>
+                    <p className="mt-3 text-sm leading-6 text-secondary">{major.description}</p>
+                    <p className="mt-2 text-sm text-text"><span className="font-semibold">មូលហេតុ៖</span> {major.reason}</p>
+                    <div className="mt-3 space-y-1 text-sm text-secondary">
+                      <div><span className="font-semibold text-primary">មុខវិជ្ជា៖</span> {major.subjects.join(' · ')}</div>
+                      <div><span className="font-semibold text-primary">ជំនាញ៖</span> {major.skills.join(' · ')}</div>
+                      <div><span className="font-semibold text-primary">អ្វីដែលត្រូវសិក្សា៖</span> {major.learningAreas.join(' · ')}</div>
+                    </div>
+                    <div className="mt-4 flex items-center justify-between gap-2 border-t border-border pt-3 text-sm">
+                      <span className="inline-flex items-center gap-1.5 font-medium text-primary">
+                        <GraduationCap className="h-4 w-4" />
+                        {isSelected ? 'លាក់សាកលវិទ្យាល័យ' : 'ស្វែងរកសាកលវិទ្យាល័យ'}
+                      </span>
+                      <ChevronDown className={`h-4 w-4 text-secondary transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${isSelected ? 'rotate-180 text-accent' : ''}`} />
+                    </div>
+                  </article>
+                );
+              })}
             </div>
-            <div className="space-y-4">
-              {result.topDimensions.map((key, index) => (
-                <div key={key} className="rounded-2xl border border-border bg-slate-50 p-4">
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-sm font-semibold uppercase tracking-[0.15em] text-secondary">#{index + 1}</span>
-                    <span className="rounded-full bg-primary/5 px-2 py-1 text-xs font-semibold text-primary">{labelMap[key]}</span>
-                  </div>
-                  <p className="mt-2 text-sm leading-6 text-secondary">
-                    {dimensionDescriptions[key]}
+          </section>
+
+          {/* ── University matches ── */}
+          {selectedMajor ? (
+            <section
+              key={selectedMajor.nameEnglish}
+              id="university-section"
+              ref={universitySectionRef}
+              aria-labelledby="university-section-title"
+              className="section-enter rounded-[12px] border border-border bg-white p-6 sm:p-8"
+            >
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <h3 id="university-section-title" className="text-lg font-semibold text-primary">
+                    សាកលវិទ្យាល័យសម្រាប់ {selectedMajor.name}
+                  </h3>
+                  <p className="mt-0.5 text-sm text-secondary">{selectedMajor.nameEnglish}</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => toggleMajor(selectedMajor.nameEnglish)}
+                  aria-label="បិទ"
+                  className="btn-ghost inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-[6px] border border-border text-secondary transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+
+              {strongestInterests.length > 0 ? (
+                <div className="mt-4 flex flex-wrap items-center gap-2 text-sm text-secondary">
+                  <span className="font-medium">ចំណាប់អារម្មណ៍ដែលពាក់ព័ន្ធ៖</span>
+                  {strongestInterests.map(({ key, score }) => (
+                    <span key={key} className="badge-pop rounded-[6px] bg-accent/10 px-2.5 py-1 text-xs font-semibold text-accent">
+                      {interestLabels[key] ?? key} {score}%
+                    </span>
+                  ))}
+                </div>
+              ) : null}
+
+              <p className="mt-4 max-w-3xl text-sm leading-6 text-secondary">
+                ថ្លៃសិក្សា និងលក្ខខណ្ឌចូលរៀនខាងក្រោមជាព័ត៌មានណែនាំបឋម។ សូមពិនិត្យមើលព័ត៌មានបច្ចុប្បន្ននៅគេហទំព័រផ្លូវការរបស់សាលាមុននឹងសម្រេចចិត្ត។
+              </p>
+
+              {universityMatches.length === 0 ? (
+                <div className="mt-5 rounded-[8px] border border-border bg-surface p-5">
+                  <p className="font-semibold text-primary">មិនមានសាកលវិទ្យាល័យក្នុងទិន្នន័យរបស់យើងនៅឡើយទេ។</p>
+                  <p className="mt-1.5 text-sm leading-6 text-secondary">
+                    ទិន្នន័យសាកលវិទ្យាល័យរបស់យើងនៅមានកំណត់។ អ្នកអាចស្វែងយល់បន្ថែមពីជំនាញ ឬពិគ្រាប់ដោយផ្ទាល់ជាមួយសាលា។
                   </p>
+                </div>
+              ) : (
+                <div className="mt-5 grid gap-4 md:grid-cols-2">
+                  {universityMatches.map((match) => (
+                    <UniversityCard
+                      key={`${match.university.id}-${match.faculty.name_en}-${match.major.key}`}
+                      match={match}
+                    />
+                  ))}
+                </div>
+              )}
+            </section>
+          ) : null}
+
+          {/* ── Career recommendations ── */}
+          <section className="section-enter rounded-[12px] border border-border bg-white p-6 sm:p-8" style={{ animationDelay: '260ms' }}>
+            <h3 className="mb-5 text-lg font-semibold text-primary">ផ្លូវអាជីពដែលអាចសាកសម ១០</h3>
+            <div className="grid gap-3 xl:grid-cols-2">
+              {result.careerRecommendations.map((career, index) => (
+                <article
+                  key={career.title}
+                  style={{ animationDelay: `${260 + index * 40}ms` }}
+                  className="recommendation-card rounded-[12px] border border-border bg-surface p-5"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <h4 className="text-base font-semibold text-primary">{career.title}</h4>
+                      <p className="mt-0.5 text-sm text-secondary">{career.titleEnglish}</p>
+                    </div>
+                    <span className="shrink-0 rounded-[6px] bg-success/10 px-2.5 py-1 text-xs font-semibold text-success">{career.alignment}</span>
+                  </div>
+                  <p className="mt-3 text-sm leading-6 text-secondary">{career.description}</p>
+                  <div className="mt-3 space-y-1 text-sm text-secondary">
+                    <div><span className="font-semibold text-primary">ភារកិច្ច៖</span> {career.responsibilities.join(' · ')}</div>
+                    <div><span className="font-semibold text-primary">ជំនាញ៖</span> {career.skills.join(' · ')}</div>
+                    <div><span className="font-semibold text-primary">ជំនាញសិក្សា៖</span> {career.relatedMajors.join(' · ')}</div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          {/* ── Reasoning ── */}
+          <section className="section-enter rounded-[12px] border border-border bg-white p-6 sm:p-8" style={{ animationDelay: '320ms' }}>
+            <h3 className="mb-5 text-lg font-semibold text-primary">ហេតុអ្វីបានជាមានការណែនាំទាំងនេះ?</h3>
+            <ul className="stagger-children space-y-2.5">
+              {result.reasoning.map((reason) => (
+                <li key={reason} className="flex items-start gap-3 rounded-[8px] border border-border bg-surface p-3 text-sm leading-6 text-secondary">
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-success" />
+                  <span>{reason}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          {/* ── Development opportunities ── */}
+          <section className="section-enter rounded-[12px] border border-border bg-white p-6 sm:p-8" style={{ animationDelay: '380ms' }}>
+            <h3 className="mb-5 text-lg font-semibold text-primary">ឱកាសអភិវឌ្ឍខ្លួន</h3>
+            <div className="stagger-children grid gap-4 md:grid-cols-3">
+              {result.developmentOpportunities.map((item) => (
+                <div key={item.title} className="rounded-[8px] border border-border bg-surface p-4">
+                  <p className="mb-2 text-xs font-bold uppercase tracking-widest text-accent">{item.title}</p>
+                  <ul className="space-y-2 text-sm leading-6 text-secondary">
+                    {item.points.map((point) => (
+                      <li key={point} className="flex items-start gap-2">
+                        <span className="mt-2.5 h-1 w-1 shrink-0 rounded-full bg-accent" />
+                        <span>{point}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               ))}
             </div>
-          </div>
-        </section>
+          </section>
 
-        <section className="rounded-[30px] border border-border bg-white p-6 shadow-soft sm:p-8">
-          <div className="mb-6 flex items-center gap-3">
-            <Compass className="h-5 w-5 text-primary" />
-            <h3 className="text-xl font-semibold text-primary">ជំនាញសាកលវិទ្យាល័យដែលបានណែនាំ ១០</h3>
-          </div>
-          <div className="grid gap-4 xl:grid-cols-2">
-            {result.majorRecommendations.map((major, index) => (
-              <article key={major.name} style={{ animationDelay: `${index * 45}ms` }} className="recommendation-card rounded-2xl border border-border bg-slate-50 p-5">
-                <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
-                  <div className="min-w-0">
-                    <h4 className="text-lg font-semibold text-primary">{major.name}</h4>
-                    <p className="mt-1 text-sm font-medium text-secondary">{major.nameEnglish}</p>
-                  </div>
-                  <span className="justify-self-start whitespace-nowrap rounded-full bg-accent/10 px-3 py-1.5 text-xs font-semibold text-accent sm:justify-self-end">{major.alignment}</span>
-                </div>
-                <p className="mt-3 text-sm leading-6 text-secondary">{major.description}</p>
-                <p className="mt-3 text-sm text-text"><span className="font-semibold">មូលហេតុដែលអាចសមស្រប៖</span> {major.reason}</p>
-                <div className="mt-4 space-y-2 text-sm text-secondary">
-                  <div><span className="font-semibold text-primary">មុខវិជ្ជា៖</span> {major.subjects.join(' • ')}</div>
-                  <div><span className="font-semibold text-primary">ជំនាញ៖</span> {major.skills.join(' • ')}</div>
-                  <div><span className="font-semibold text-primary">អ្វីដែលត្រូវសិក្សា៖</span> {major.learningAreas.join(' • ')}</div>
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
+          {/* ── Alternative paths ── */}
+          <section className="section-enter rounded-[12px] border border-border bg-white p-6 sm:p-8" style={{ animationDelay: '440ms' }}>
+            <h3 className="mb-5 text-lg font-semibold text-primary">ជម្រើសផ្សេងទៀតសម្រាប់ស្វែងយល់</h3>
+            <div className="stagger-children flex flex-wrap gap-2">
+              {result.alternativePaths.map((path) => (
+                <span key={path} className="rounded-[6px] border border-border bg-surface px-3 py-2 text-sm text-secondary transition-colors hover:border-accent/40 hover:text-primary">
+                  {path}
+                </span>
+              ))}
+            </div>
+          </section>
 
-        <section className="rounded-[30px] border border-border bg-white p-6 shadow-soft sm:p-8">
-          <div className="mb-6 flex items-center gap-3">
-            <BriefcaseBusiness className="h-5 w-5 text-primary" />
-            <h3 className="text-xl font-semibold text-primary">ផ្លូវអាជីពដែលអាចសាកសម ១០</h3>
-          </div>
-          <div className="grid gap-4 xl:grid-cols-2">
-            {result.careerRecommendations.map((career, index) => (
-              <article key={career.title} style={{ animationDelay: `${index * 45}ms` }} className="recommendation-card rounded-2xl border border-border bg-slate-50 p-5">
-                <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
-                  <div className="min-w-0">
-                    <h4 className="text-lg font-semibold text-primary">{career.title}</h4>
-                    <p className="mt-1 text-sm font-medium text-secondary">{career.titleEnglish}</p>
-                  </div>
-                  <span className="justify-self-start whitespace-nowrap rounded-full bg-success/10 px-3 py-1.5 text-xs font-semibold text-success sm:justify-self-end">{career.alignment}</span>
-                </div>
-                <p className="mt-3 text-sm leading-6 text-secondary">{career.description}</p>
-                <div className="mt-4 space-y-2 text-sm text-secondary">
-                  <div><span className="font-semibold text-primary">ភារកិច្ច៖</span> {career.responsibilities.join(' • ')}</div>
-                  <div><span className="font-semibold text-primary">ជំនាញ៖</span> {career.skills.join(' • ')}</div>
-                  <div><span className="font-semibold text-primary">ជំនាញសិក្សាដែលពាក់ព័ន្ធ៖</span> {career.relatedMajors.join(' • ')}</div>
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <section className="rounded-[30px] border border-border bg-white p-6 shadow-soft sm:p-8">
-          <div className="mb-6 flex items-center gap-3">
-            <Sparkles className="h-5 w-5 text-primary" />
-            <h3 className="text-xl font-semibold text-primary">ហេតុអ្វីបានជាមានការណែនាំទាំងនេះ?</h3>
-          </div>
-          <ul className="space-y-3 text-sm leading-6 text-secondary">
-            {result.reasoning.map((reason) => (
-              <li key={reason} className="flex items-start gap-3 rounded-2xl border border-border bg-slate-50 p-3">
-                <CheckCircle2 className="mt-1 h-4 w-4 shrink-0 text-success" />
-                <span>{reason}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        <section className="rounded-[30px] border border-border bg-white p-6 shadow-soft sm:p-8">
-          <div className="mb-6 flex items-center gap-3">
-            <TrendingUp className="h-5 w-5 text-primary" />
-            <h3 className="text-xl font-semibold text-primary">ឱកាសអភិវឌ្ឍខ្លួន</h3>
-          </div>
-          <div className="grid gap-4 md:grid-cols-3">
-            {result.developmentOpportunities.map((item) => (
-              <div key={item.title} className="rounded-2xl border border-border bg-slate-50 p-4">
-                <p className="mb-2 text-sm font-semibold uppercase tracking-[0.15em] text-accent">{item.title}</p>
-                <ul className="space-y-2 text-sm leading-6 text-secondary">
-                  {item.points.map((point) => (
-                    <li key={point} className="flex items-start gap-2">
-                      <span className="mt-2 h-1.5 w-1.5 rounded-full bg-accent" />
-                      <span>{point}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="rounded-[30px] border border-border bg-white p-6 shadow-soft sm:p-8">
-          <div className="mb-6 flex items-center gap-3">
-            <Compass className="h-5 w-5 text-primary" />
-            <h3 className="text-xl font-semibold text-primary">ជម្រើសផ្សេងទៀតសម្រាប់ស្វែងយល់</h3>
-          </div>
-          <div className="flex flex-wrap gap-3 text-sm text-secondary">
-            {result.alternativePaths.map((path) => (
-              <span key={path} className="rounded-full border border-border bg-slate-50 px-3 py-2">{path}</span>
-            ))}
-          </div>
-        </section>
-      </div>
-    </main>
+        </div>
+      </main>
+    </div>
   );
 }
 
+/* ─────────────────────────────────────────────
+   Animated bar component (results radar panel)
+───────────────────────────────────────────── */
+function AnimatedBar({ label, value, delay }: { label: string; value: number; delay: number }) {
+  const width = useBarAnimation(value, delay);
+  return (
+    <div className="rounded-[8px] border border-border bg-surface p-3">
+      <div className="mb-1.5 flex items-center justify-between gap-2 text-xs">
+        <span className="font-semibold text-primary">{label}</span>
+        <span className="tabular-nums text-secondary">{value}%</span>
+      </div>
+      <div className="h-1.5 overflow-hidden rounded-full bg-border">
+        <div
+          className="h-full rounded-full bg-accent"
+          style={{ width: `${width}%`, transition: 'width 700ms cubic-bezier(0.16,1,0.3,1)' }}
+        />
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────
+   Root
+───────────────────────────────────────────── */
 export default function Home() {
   const [screen, setScreen] = useState<Screen>('welcome');
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -544,134 +998,74 @@ export default function Home() {
   const [pendingConfirmation, setPendingConfirmation] = useState<ConfirmationIntent | null>(null);
 
   const currentQuestion = assessmentQuestions[currentIndex];
-
   const selectedOptions = currentQuestion ? answers[currentQuestion.id] ?? [] : [];
 
-  const handleStart = () => {
-    setScreen('assessment');
-    setCurrentIndex(0);
-    setValidationMessage('');
-  };
-
   const returnToWelcome = () => {
-    setAnswers({});
-    setCurrentIndex(0);
-    setValidationMessage('');
-    setResult(null);
-    setScreen('welcome');
+    setAnswers({}); setCurrentIndex(0); setValidationMessage(''); setResult(null); setScreen('welcome');
   };
 
   const handleCloseAssessment = () => {
-    const hasAnswers = Object.values(answers).some((selected) => selected.length > 0);
-    if (hasAnswers) {
-      setPendingConfirmation('close');
-      return;
-    }
+    const hasAnswers = Object.values(answers).some((s) => s.length > 0);
+    if (hasAnswers) { setPendingConfirmation('close'); return; }
     returnToWelcome();
   };
 
   const handleConfirmAction = () => {
     const action = pendingConfirmation;
     setPendingConfirmation(null);
-    if (action === 'close') {
-      returnToWelcome();
-    } else if (action === 'submit') {
-      setResult(getAssessmentResults(assessmentQuestions, answers));
-      setScreen('analysis');
-    }
+    if (action === 'close') returnToWelcome();
+    else if (action === 'submit') { setResult(getAssessmentResults(assessmentQuestions, answers)); setScreen('analysis'); }
   };
 
   const handleSelect = (optionId: string) => {
-    const question = assessmentQuestions[currentIndex];
-    if (!question) return;
-
+    const q = assessmentQuestions[currentIndex];
+    if (!q) return;
     setValidationMessage('');
     setAnswers((prev) => {
-      const current = prev[question.id] ?? [];
-      if (!question.allowMultiple) {
-        return { ...prev, [question.id]: [optionId] };
-      }
-
-      return {
-        ...prev,
-        [question.id]: current.includes(optionId)
-          ? current.filter((id) => id !== optionId)
-          : [...current, optionId],
-      };
+      const cur = prev[q.id] ?? [];
+      if (!q.allowMultiple) return { ...prev, [q.id]: [optionId] };
+      return { ...prev, [q.id]: cur.includes(optionId) ? cur.filter((id) => id !== optionId) : [...cur, optionId] };
     });
   };
 
   const handleNext = () => {
     if (!currentQuestion) return;
-
     const selected = answers[currentQuestion.id] ?? [];
-    if (selected.length === 0) {
-      setValidationMessage('សូមជ្រើសរើសចម្លើយយ៉ាងតិចមួយ មុននឹងបន្ត។');
-      return;
-    }
-
-    if (currentIndex < assessmentQuestions.length - 1) {
-      setCurrentIndex((index) => index + 1);
-      setValidationMessage('');
-      return;
-    }
-
+    if (selected.length === 0) { setValidationMessage('សូមជ្រើសរើសចម្លើយយ៉ាងតិចមួយ មុននឹងបន្ត។'); return; }
+    if (currentIndex < assessmentQuestions.length - 1) { setCurrentIndex((i) => i + 1); setValidationMessage(''); return; }
     setPendingConfirmation('submit');
   };
 
   const handleBack = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex((index) => index - 1);
-      setValidationMessage('');
-    }
+    if (currentIndex > 0) { setCurrentIndex((i) => i - 1); setValidationMessage(''); }
   };
 
   useEffect(() => {
     if (screen !== 'analysis' || !result) return;
-
-    const timer = setTimeout(() => {
-      setScreen('results');
-    }, 4200);
-
-    return () => clearTimeout(timer);
+    const t = setTimeout(() => setScreen('results'), 4200);
+    return () => clearTimeout(t);
   }, [screen, result]);
 
-  if (screen === 'welcome') {
-    return <WelcomeScreen onStart={handleStart} />;
-  }
+  if (screen === 'welcome') return <WelcomeScreen onStart={() => { setScreen('assessment'); setCurrentIndex(0); setValidationMessage(''); }} />;
 
   if (screen === 'assessment' && currentQuestion) {
     return (
       <AssessmentScreen
-        question={currentQuestion}
-        questionIndex={currentIndex}
-        total={TOTAL_QUESTIONS}
-        selected={selectedOptions}
-        onSelect={handleSelect}
-        onBack={handleBack}
-        onClose={handleCloseAssessment}
-        onNext={handleNext}
-        isFirst={currentIndex === 0}
-        isLast={currentIndex === TOTAL_QUESTIONS - 1}
-        validationMessage={validationMessage}
-        confirmation={pendingConfirmation}
-        onCancelConfirmation={() => setPendingConfirmation(null)}
-        onConfirmConfirmation={handleConfirmAction}
+        question={currentQuestion} questionIndex={currentIndex} total={TOTAL_QUESTIONS}
+        selected={selectedOptions} onSelect={handleSelect}
+        onBack={handleBack} onClose={handleCloseAssessment} onNext={handleNext}
+        isFirst={currentIndex === 0} isLast={currentIndex === TOTAL_QUESTIONS - 1}
+        validationMessage={validationMessage} confirmation={pendingConfirmation}
+        onCancelConfirmation={() => setPendingConfirmation(null)} onConfirmConfirmation={handleConfirmAction}
       />
     );
   }
 
-  if (screen === 'analysis') {
-    return <AnalysisScreen />;
-  }
+  if (screen === 'analysis') return <AnalysisScreen />;
 
   if (screen === 'results' && result) {
     return <ResultsScreen result={result} onRetake={() => {
-      setAnswers({});
-      setCurrentIndex(0);
-      setScreen('welcome');
-      setValidationMessage('');
-      setResult(null);
+      setAnswers({}); setCurrentIndex(0); setScreen('welcome'); setValidationMessage(''); setResult(null);
     }} />;
   }
 

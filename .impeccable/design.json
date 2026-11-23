@@ -1,0 +1,292 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-20T05:00:43.000Z",
+  "title": "Design System: PATHFINDER",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Deep Guidance Navy",
+        "canonical": "#172B4D",
+        "tonalRamp": ["#0B1220", "#172B4D", "#24406B", "#3D5A88", "#6B84AB", "#A3B3CA", "#D2DAE6", "#EDF1F6"]
+      },
+      "primary-hover": {
+        "role": "primary",
+        "displayName": "Navy Deep",
+        "canonical": "#102545",
+        "tonalRamp": ["#070E1A", "#102545", "#1C365C", "#33507A", "#5E77A0", "#97A8C4", "#CBD4E2", "#E9EDF4"]
+      },
+      "accent": {
+        "role": "secondary",
+        "displayName": "Steady Compass Blue",
+        "canonical": "#4779D1",
+        "tonalRamp": ["#12295C", "#1F4189", "#2E5CB8", "#4779D1", "#6E97DF", "#9DBAEB", "#C9D8F4", "#EAF0FC"]
+      },
+      "accent-tint": {
+        "role": "secondary",
+        "displayName": "Compass Tint",
+        "canonical": "rgba(71, 121, 209, 0.1)"
+      },
+      "success": {
+        "role": "tertiary",
+        "displayName": "Pathway Green",
+        "canonical": "#27845A",
+        "tonalRamp": ["#0C2E1F", "#144A32", "#1E6847", "#27845A", "#4F9E7C", "#83BFA5", "#B5DACA", "#E3F2EA"]
+      },
+      "success-tint": {
+        "role": "tertiary",
+        "displayName": "Pathway Tint",
+        "canonical": "rgba(39, 132, 90, 0.1)"
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Misty Paper",
+        "canonical": "#F7F8FA",
+        "tonalRamp": ["#15171B", "#33373E", "#626770", "#979CA6", "#C7CBD2", "#E6E9ED", "#F7F8FA", "#FCFCFD"]
+      },
+      "card": {
+        "role": "neutral",
+        "displayName": "Card White",
+        "canonical": "#FFFFFF",
+        "tonalRamp": ["#1A1C1F", "#3B3E43", "#6D7178", "#A4A8AF", "#D2D5DA", "#EBEDEF", "#FFFFFF", "#FFFFFF"]
+      },
+      "text": {
+        "role": "neutral",
+        "displayName": "Ink Text",
+        "canonical": "#202938",
+        "tonalRamp": ["#0B0E13", "#202938", "#3A4556", "#5D6879", "#8B94A3", "#B7BDC8", "#DDE1E7", "#F2F4F7"]
+      },
+      "secondary": {
+        "role": "neutral",
+        "displayName": "Slate Secondary",
+        "canonical": "#64748B",
+        "tonalRamp": ["#1A202C", "#2D3748", "#4A5568", "#64748B", "#8A94A6", "#B0B8C4", "#D5DAE1", "#EEF1F4"]
+      },
+      "border": {
+        "role": "neutral",
+        "displayName": "Hairline Gray",
+        "canonical": "#E5E9F0",
+        "tonalRamp": ["#2B313A", "#4C5563", "#7B8595", "#A8B0BC", "#CBD1DB", "#E5E9F0", "#F2F4F8", "#FAFBFC"]
+      },
+      "focus-ring": {
+        "role": "neutral",
+        "displayName": "Focus Ring Blue",
+        "canonical": "#BFDBFE",
+        "tonalRamp": ["#1E3A5F", "#2B5A9E", "#3B7CCC", "#6BA3E8", "#93C0F4", "#BFDBFE", "#DDEDFD", "#F3F9FF"]
+      },
+      "progress-track": {
+        "role": "neutral",
+        "displayName": "Progress Track",
+        "canonical": "#E2E8F0",
+        "tonalRamp": ["#1E293B", "#334155", "#64748B", "#94A3B8", "#CBD5E1", "#E2E8F0", "#F1F5F9", "#F8FAFC"]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Welcome headline only — the one moment the product introduces itself."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Screen titles: question prompts, analysis and results headings."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Section headings inside results (interest profile, majors, careers, reasoning)."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Paragraphs and instructions; card copy steps down to 0.875rem / 1.5."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Eyebrows, PATHFINDER badge, rank markers, and meta captions."
+      }
+    },
+    "shadows": [
+      {
+        "name": "ambient-card-lift",
+        "value": "0 20px 45px -25px rgba(23, 43, 77, 0.25)",
+        "purpose": "Every white section card and the welcome/analysis panels (shadow-soft)."
+      },
+      {
+        "name": "card-hover-response",
+        "value": "0 8px 20px rgba(23, 43, 77, 0.06)",
+        "purpose": "Recommendation cards on hover, paired with translateY(-2px) and a blue-tinted border."
+      },
+      {
+        "name": "dialog-elevation",
+        "value": "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+        "purpose": "Confirmation modal panels over the slate-950/45 backdrop."
+      },
+      {
+        "name": "selected-option",
+        "value": "0 1px 3px rgba(0, 0, 0, 0.1)",
+        "purpose": "Chosen answer options, paired with ring-2 at primary/20."
+      }
+    ],
+    "motion": [
+      {
+        "name": "screen-enter",
+        "value": "460ms cubic-bezier(0.22, 1, 0.36, 1)",
+        "purpose": "Full-screen transition into welcome, assessment, analysis, and results."
+      },
+      {
+        "name": "dialog-backdrop-fade",
+        "value": "180ms ease-out",
+        "purpose": "Confirmation dialog backdrop opacity fade-in."
+      },
+      {
+        "name": "dialog-panel-enter",
+        "value": "260ms cubic-bezier(0.22, 1, 0.36, 1)",
+        "purpose": "Confirmation dialog panel rise and settle."
+      },
+      {
+        "name": "card-enter-stagger",
+        "value": "480ms cubic-bezier(0.22, 1, 0.36, 1), 45ms delay per card",
+        "purpose": "Recommendation cards rising into the results grid."
+      },
+      {
+        "name": "card-hover",
+        "value": "260ms cubic-bezier(0.22, 1, 0.36, 1)",
+        "purpose": "Recommendation card lift, border, and shadow on hover."
+      },
+      {
+        "name": "progress-width",
+        "value": "500–700ms ease-out",
+        "purpose": "Question progress bar and analysis step meter fills."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "animation-duration: 0.01ms; transition-duration: 0.01ms",
+        "purpose": "prefers-reduced-motion: reduce collapses all motion to effectively instant."
+      }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Navy pill for the primary action on every screen.",
+      "html": "<button class=\"ds-btn-primary\">ចាប់ផ្តើមការវាយតម្លៃ<svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/></svg></button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; gap: 12px; background: var(--color-primary, #172B4D); color: #fff; padding: 14px 24px; border: none; border-radius: 9999px; font-family: 'Noto Sans Khmer', 'Khmer OS System', sans-serif; font-size: 16px; font-weight: 600; line-height: 1.5; cursor: pointer; transition: background 200ms ease, transform 200ms ease; } .ds-btn-primary:hover { background: var(--color-primary-hover, #102545); } .ds-btn-primary:focus-visible { outline: none; box-shadow: 0 0 0 4px #BFDBFE; } .ds-btn-primary:active { transform: translateY(1px); }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Outline pill for cancel, back, retake, and other supporting actions.",
+      "html": "<button class=\"ds-btn-secondary\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m12 19-7-7 7-7\"/><path d=\"M19 12H5\"/></svg>ត្រឡប់ក្រោយ</button>",
+      "css": ".ds-btn-secondary { display: inline-flex; align-items: center; gap: 8px; background: #FFFFFF; color: var(--color-primary, #172B4D); padding: 10px 16px; border: 1px solid var(--color-border, #E5E9F0); border-radius: 9999px; font-family: 'Noto Sans Khmer', 'Khmer OS System', sans-serif; font-size: 14px; font-weight: 500; line-height: 1.5; cursor: pointer; transition: border-color 200ms ease, background 200ms ease; } .ds-btn-secondary:hover { border-color: rgba(71, 121, 209, 0.7); background: #F8FAFC; } .ds-btn-secondary:focus-visible { outline: none; box-shadow: 0 0 0 4px #BFDBFE; } .ds-btn-secondary:disabled { opacity: 0.4; cursor: not-allowed; }"
+    },
+    {
+      "name": "Option Card",
+      "kind": "button",
+      "refersTo": "option-card",
+      "description": "Selectable answer row on the assessment screen; selected state shows a filled navy indicator.",
+      "html": "<button class=\"ds-option-card\" aria-pressed=\"true\"><span class=\"ds-option-indicator\">✓</span><span class=\"ds-option-label\">ជ្រើសរើសចម្លើយនេះ</span></button>",
+      "css": ".ds-option-card { display: flex; align-items: flex-start; gap: 12px; width: 100%; text-align: left; background: #FFFFFF; color: var(--color-text, #202938); border: 1px solid var(--color-border, #E5E9F0); border-radius: 16px; padding: 16px; font-family: 'Noto Sans Khmer', 'Khmer OS System', sans-serif; font-size: 16px; font-weight: 500; line-height: 1.75; cursor: pointer; transition: border-color 200ms ease, background 200ms ease, box-shadow 200ms ease; } .ds-option-card:hover { border-color: rgba(71, 121, 209, 0.7); background: #F8FAFC; } .ds-option-card:focus-visible { outline: none; box-shadow: 0 0 0 4px #BFDBFE; } .ds-option-card[aria-pressed=\"true\"] { border-color: var(--color-primary, #172B4D); background: rgba(23, 43, 77, 0.05); box-shadow: 0 0 0 2px rgba(23, 43, 77, 0.2), 0 1px 3px rgba(0, 0, 0, 0.1); } .ds-option-indicator { display: flex; align-items: center; justify-content: center; flex-shrink: 0; width: 20px; height: 20px; margin-top: 2px; border-radius: 9999px; border: 1px solid #CBD5E1; background: #FFFFFF; color: transparent; font-size: 10px; font-weight: 600; } .ds-option-card[aria-pressed=\"true\"] .ds-option-indicator { border-color: var(--color-primary, #172B4D); background: var(--color-primary, #172B4D); color: #FFFFFF; } .ds-option-label { flex: 1; }"
+    },
+    {
+      "name": "Section Card",
+      "kind": "card",
+      "refersTo": "card-section",
+      "description": "The white 30px-radius container behind every results section and the analysis panel.",
+      "html": "<section class=\"ds-card-section\"><h3 class=\"ds-card-heading\">ជំនាញសាកលវិទ្យាល័យដែលបានណែនាំ ១០</h3><p class=\"ds-card-body\">មូលហេតុដែលអាចសមស្រប៖ ចម្លើយរបស់អ្នកឆ្លុះបញ្ចាំងពីចំណាប់អារម្មណ៍លើការស្រាវជ្រាវ។</p></section>",
+      "css": ".ds-card-section { background: #FFFFFF; border: 1px solid var(--color-border, #E5E9F0); border-radius: 30px; padding: 24px; box-shadow: 0 20px 45px -25px rgba(23, 43, 77, 0.25); font-family: 'Noto Sans Khmer', 'Khmer OS System', sans-serif; } .ds-card-heading { margin: 0 0 16px; color: var(--color-primary, #172B4D); font-size: 20px; font-weight: 600; line-height: 1.4; } .ds-card-body { margin: 0; color: var(--color-secondary, #64748B); font-size: 14px; line-height: 1.5; }"
+    },
+    {
+      "name": "Alignment Chip",
+      "kind": "chip",
+      "refersTo": "chip-accent",
+      "description": "Tinted pill badge on major (blue) and career (green) recommendation cards.",
+      "html": "<span class=\"ds-chip-accent\">ការស្រាវជ្រាវ</span> <span class=\"ds-chip-success\">ការជួយអ្នកដទៃ</span>",
+      "css": ".ds-chip-accent, .ds-chip-success { display: inline-flex; align-items: center; padding: 6px 12px; border-radius: 9999px; font-family: 'Noto Sans Khmer', 'Khmer OS System', sans-serif; font-size: 12px; font-weight: 600; line-height: 1.5; white-space: nowrap; } .ds-chip-accent { background: rgba(71, 121, 209, 0.1); color: var(--color-accent, #4779D1); } .ds-chip-accent:hover { background: rgba(71, 121, 209, 0.18); } .ds-chip-success { background: rgba(39, 132, 90, 0.1); color: var(--color-success, #27845A); } .ds-chip-success:hover { background: rgba(39, 132, 90, 0.18); }"
+    },
+    {
+      "name": "Progress Bar",
+      "kind": "custom",
+      "refersTo": "progress",
+      "description": "8px pill track for question progress and dimension score fills.",
+      "html": "<div class=\"ds-progress\" role=\"progressbar\" aria-valuenow=\"45\" aria-valuemin=\"0\" aria-valuemax=\"100\"><div class=\"ds-progress-fill\" style=\"width: 45%\"></div></div>",
+      "css": ".ds-progress { height: 8px; width: 100%; overflow: hidden; border-radius: 9999px; background: var(--color-progress-track, #E2E8F0); } .ds-progress-fill { height: 100%; border-radius: 9999px; background: var(--color-primary, #172B4D); transition: width 500ms ease-out; } .ds-progress-fill.is-accent { background: var(--color-accent, #4779D1); } .ds-progress:hover .ds-progress-fill { filter: brightness(1.08); }"
+    },
+    {
+      "name": "Confirmation Dialog",
+      "kind": "custom",
+      "refersTo": "dialog",
+      "description": "Alert dialog for close-with-answers and submit confirmations.",
+      "html": "<div class=\"ds-dialog-backdrop\"><section class=\"ds-dialog-panel\" role=\"alertdialog\" aria-modal=\"true\"><h2 class=\"ds-dialog-title\">បញ្ជាក់ការបញ្ជូនចម្លើយ</h2><p class=\"ds-dialog-desc\">តើអ្នកប្រាកដថាចង់បញ្ជូនចម្លើយទាំង ២០ របស់អ្នកមែនទេ?</p><div class=\"ds-dialog-actions\"><button class=\"ds-btn-secondary\">បន្ត</button><button class=\"ds-btn-primary ds-dialog-confirm\">បញ្ជូនចម្លើយ</button></div></section></div>",
+      "css": ".ds-dialog-backdrop { display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(2, 6, 23, 0.45); font-family: 'Noto Sans Khmer', 'Khmer OS System', sans-serif; } .ds-dialog-panel { width: 100%; max-width: 28rem; background: #FFFFFF; border: 1px solid var(--color-border, #E5E9F0); border-radius: 16px; padding: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); } .ds-dialog-title { margin: 0; color: var(--color-primary, #172B4D); font-size: 20px; font-weight: 600; line-height: 1.4; } .ds-dialog-desc { margin: 12px 0 0; color: var(--color-secondary, #64748B); font-size: 14px; line-height: 1.5; } .ds-dialog-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 12px; margin-top: 28px; } .ds-dialog-confirm { padding: 10px 16px; font-size: 14px; }"
+    },
+    {
+      "name": "Recommendation Card",
+      "kind": "card",
+      "refersTo": "recommendation-card",
+      "description": "Staggered-rise results tile for majors and careers with a hover lift.",
+      "html": "<article class=\"ds-rec-card\"><div class=\"ds-rec-head\"><div><h4 class=\"ds-rec-title\">វិទ្យាសាស្ត្រកុំព្យូទ័រ</h4><p class=\"ds-rec-subtitle\">Computer Science</p></div><span class=\"ds-chip-accent\">ការស្រាវជ្រាវ</span></div><p class=\"ds-rec-desc\">មូលហេតុដែលអាចសមស្រប៖ ចម្លើយរបស់អ្នកឆ្លុះបញ្ចាំងពីចំណាប់អារម្មណ៍លើការស្រាវជ្រាវ។</p></article>",
+      "css": ".ds-rec-card { background: #F8FAFC; border: 1px solid var(--color-border, #E5E9F0); border-radius: 16px; padding: 20px; font-family: 'Noto Sans Khmer', 'Khmer OS System', sans-serif; transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1), border-color 260ms ease, box-shadow 260ms ease; } .ds-rec-card:hover { transform: translateY(-2px); border-color: rgba(71, 121, 209, 0.45); box-shadow: 0 8px 20px rgba(23, 43, 77, 0.06); } .ds-rec-card:focus-within { outline: none; box-shadow: 0 0 0 4px #BFDBFE; } .ds-rec-head { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 12px; } .ds-rec-title { margin: 0; color: var(--color-primary, #172B4D); font-size: 18px; font-weight: 600; line-height: 1.4; } .ds-rec-subtitle { margin: 4px 0 0; color: var(--color-secondary, #64748B); font-size: 14px; font-weight: 500; } .ds-rec-desc { margin: 12px 0 0; color: var(--color-secondary, #64748B); font-size: 14px; line-height: 1.5; }"
+    },
+    {
+      "name": "PATHFINDER Badge",
+      "kind": "custom",
+      "refersTo": "badge-pathfinder",
+      "description": "Uppercase eyebrow pill with compass icon on the welcome screen.",
+      "html": "<span class=\"ds-badge-pathfinder\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"12\" cy=\"12\" r=\"10\"/><polygon points=\"16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76\"/></svg>PATHFINDER</span>",
+      "css": ".ds-badge-pathfinder { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border: 1px solid var(--color-border, #E5E9F0); border-radius: 9999px; background: #F8FAFC; color: var(--color-primary, #172B4D); font-family: 'Noto Sans Khmer', 'Khmer OS System', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; } .ds-badge-pathfinder:hover { border-color: rgba(71, 121, 209, 0.7); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Guidance Compass",
+    "overview": "PATHFINDER is a quiet guide that points the way without deciding for the student. The system is calm, reassuring, and structured: one centered column of white cards floating on a cool misty surface, pill-shaped controls that feel friendly rather than clinical, and generous leading that lets Khmer script breathe. Every screen answers the same need — a high-school student sitting alone with a consequential choice — so the design lowers pressure instead of raising it.\n\nDensity stays low and rhythm stays regular. Depth comes from a single ambient shadow rather than stacked layers; emphasis comes from weight and scale rather than decoration. Confirmed visual rejections: judgmental or high-pressure assessment styling, gamified flash (points, streaks, confetti), corporate-assessment coldness, gradients, glass, and hard offset shadows.",
+    "keyCharacteristics": [
+      "Single-screen guided flow (welcome → questions → analysis → results) on a cool misty surface",
+      "Pill controls and large-radius white cards — soft, continuous, reassuring geometry",
+      "Deep navy leads headings and actions; steady blue marks progress and data",
+      "Khmer-first typography with generous leading; English only as secondary names",
+      "Flat surfaces with one navy-tinted ambient lift shadow",
+      "Calm, staggered motion that fully respects `prefers-reduced-motion`",
+      "Guidance voice — every recommendation shows its reasoning; the student keeps the decision"
+    ],
+    "rules": [
+      {
+        "name": "The Guidance Navy Rule",
+        "body": "Deep navy leads every heading and primary action; steady blue marks progress, data, and selection feedback — it never takes the primary action's place.",
+        "section": "colors"
+      },
+      {
+        "name": "The Khmer-First Rule",
+        "body": "All interface copy renders in the Khmer stack with generous body leading (1.75); English appears only as secondary names on majors and careers — a bridge, never the interface.",
+        "section": "typography"
+      },
+      {
+        "name": "The Ambient Lift Rule",
+        "body": "Surfaces are flat at rest; one soft navy-tinted shadow lifts them. Depth appears only as a response to state — hover, selection, modal — never as resting decoration.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do keep every interactive control a full pill (9999px) and every section card at 30px radius with a hairline border plus the ambient lift shadow.",
+      "Do render all primary UI copy in Khmer with the Noto Sans Khmer stack and body leading of 1.75.",
+      "Do use Deep Guidance Navy for headings and primary actions; reserve Steady Compass Blue for progress, data fills, and selection feedback.",
+      "Do give every focusable control `focus-visible: ring-4` in Focus Ring Blue (#BFDBFE).",
+      "Do stagger recommendation cards (45ms per card) and honor `prefers-reduced-motion` by collapsing animation to effectively instant.",
+      "Do write copy as guidance: encouraging and non-judgmental; results show reasoning and leave the decision to the student."
+    ],
+    "donts": [
+      "Don't use square or hard-edged corners — no 0px radius on cards, buttons, or chips.",
+      "Don't add gradients, glass/blur decoration, or hard offset shadows (4px 4px 0).",
+      "Don't let Steady Compass Blue replace navy as the primary action color.",
+      "Don't introduce English-first labels; English appears only as secondary names on majors and careers.",
+      "Don't use emoji or bare unicode glyphs as icons — icons come from lucide-react at 16–24px with consistent stroke.",
+      "Don't present results as verdicts or use judgmental, high-pressure, or gamified styling."
+    ]
+  }
+}
