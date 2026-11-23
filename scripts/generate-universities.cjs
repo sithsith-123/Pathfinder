@@ -1,0 +1,3396 @@
+const fs = require('fs');
+const path = require('path');
+
+const universities = [
+  // ─────────────────────────────────────────────
+  // 1. Phnom Penh (រាជធានីភ្នំពេញ)
+  // ─────────────────────────────────────────────
+  {
+    id: "rupp",
+    name_en: "Royal University of Phnom Penh",
+    name_km: "សាកលវិទ្យាល័យភូមិន្ទភ្នំពេញ",
+    short_name: "RUPP",
+    location: "Russian Federation Blvd, Tuol Kork, Phnom Penh",
+    province: "Phnom Penh",
+    province_km: "រាជធានីភ្នំពេញ",
+    website: "https://www.rupp.edu.kh",
+    teaching_languages: ["Khmer", "English"],
+    ranking: 1,
+    faculties: [
+      {
+        name_en: "Faculty of Science",
+        name_km: "មហាវិទ្យាល័យវិទ្យាសាស្ត្រ",
+        majors: [
+          {
+            key: "computer_science",
+            name_en: "Computer Science",
+            name_km: "វិទ្យាសាស្ត្រកុំព្យូទ័រ",
+            tuition_per_year_usd: 500,
+            admission_requirements: ["សញ្ញាបត្រមធ្យមសិក្សាទុតិយភូមិ (បាក់ឌុប)", "ប្រឡងតេស្តសមត្ថភាពចូលរៀន"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋាភិបាល ១០០%", "អាហារូបករណ៍និស្សិតឆ្នើម"],
+            related_majors: ["software_engineering", "data_science"]
+          },
+          {
+            key: "data_science",
+            name_en: "Data Science",
+            name_km: "វិទ្យាសាស្ត្រទិន្នន័យ",
+            tuition_per_year_usd: 600,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប និទ្ទេសល្អគណិតវិទ្យា"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋាភិបាល", "អាហារូបករណ៍ឌីជីថល"],
+            related_majors: ["computer_science"]
+          },
+          {
+            key: "environmental_science",
+            name_en: "Environmental Science",
+            name_km: "វិទ្យាសាស្ត្របរិស្ថាន",
+            tuition_per_year_usd: 450,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប (វិទ្យាសាស្ត្រពិត ឬសង្គម)"],
+            scholarships: ["អាហារូបករណ៍ក្រសួងបរិស្ថាន", "អាហារូបករណ៍រដ្ឋ"],
+            related_majors: ["agriculture"]
+          }
+        ]
+      },
+      {
+        name_en: "Faculty of Social Sciences and Humanities",
+        name_km: "មហាវិទ្យាល័យសង្គមសាស្ត្រ និងមនុស្សសាស្ត្រ",
+        majors: [
+          {
+            key: "psychology",
+            name_en: "Psychology",
+            name_km: "ចិត្តវិទ្យា (ដេប៉ាតឺម៉ង់ចិត្តវិទ្យា #1)",
+            tuition_per_year_usd: 500,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប", "ការសម្ភាសន៍ផ្ទាល់មាត់"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋាភិបាល ១០០%", "អាហារូបករណ៍អង្គការដៃគូ"],
+            related_majors: ["education", "public_health"]
+          },
+          {
+            key: "tourism_and_hospitality_management",
+            name_en: "Tourism and Hospitality Management",
+            name_km: "ទេសចរណ៍ និងបដិសណ្ឋារកិច្ច",
+            tuition_per_year_usd: 500,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប", "តេស្តភាសាអង់គ្លេស"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋាភិបាល"],
+            related_majors: ["business_administration", "marketing"]
+          }
+        ]
+      },
+      {
+        name_en: "Institute of Foreign Languages & International Studies",
+        name_km: "វិទ្យាស្ថានភាសាបរទេស និងការសិក្សាអន្តរជាតិ (IFL/DIS)",
+        majors: [
+          {
+            key: "international_relations",
+            name_en: "International Relations",
+            name_km: "ទំនាក់ទំនងអន្តរជាតិ (DIS - លំដាប់ #1 កម្ពុជា)",
+            tuition_per_year_usd: 650,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប", "ប្រឡងតេស្តភាសាអង់គ្លេសកម្រិតខ្ពស់ IFL"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋាភិបាល", "អាហារូបករណ៍សម្តេចតេជោ"],
+            related_majors: ["law", "economics"]
+          },
+          {
+            key: "education",
+            name_en: "Higher Education Pedagogy & English Education",
+            name_km: "អប់រំ និងគរុកោសល្យភាសាអង់គ្លេស",
+            tuition_per_year_usd: 500,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប", "ចំណង់ចំណូលចិត្តក្នុងការបង្រៀន"],
+            scholarships: ["អាហារូបករណ៍ក្រសួងអប់រំ"],
+            related_majors: ["psychology"]
+          }
+        ]
+      },
+      {
+        name_en: "Faculty of Development Studies",
+        name_km: "មហាវិទ្យាល័យសិក្សាអភិវឌ្ឍន៍",
+        majors: [
+          {
+            key: "economics",
+            name_en: "Economics & Development",
+            name_km: "សេដ្ឋកិច្ច និងការអភិវឌ្ឍ",
+            tuition_per_year_usd: 550,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋ"],
+            related_majors: ["business_administration", "accounting"]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "itc",
+    name_en: "Institute of Technology of Cambodia",
+    name_km: "វិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា (តិចណូ)",
+    short_name: "ITC",
+    location: "Russian Federation Blvd, Phnom Penh",
+    province: "Phnom Penh",
+    province_km: "រាជធានីភ្នំពេញ",
+    website: "https://www.itc.edu.kh",
+    teaching_languages: ["French", "Khmer", "English"],
+    ranking: 1,
+    faculties: [
+      {
+        name_en: "Faculty of Civil Engineering",
+        name_km: "ដេប៉ាតឺម៉ង់វិស្វកម្មសំណង់ស៊ីវិល",
+        majors: [
+          {
+            key: "civil_engineering",
+            name_en: "Civil Engineering",
+            name_km: "វិស្វកម្មសំណង់ស៊ីវិល (លំដាប់ #1 កម្ពុជា)",
+            tuition_per_year_usd: 500,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប (វិទ្យាសាស្ត្រពិត)", "ប្រឡងជាប់ការប្រឡងថ្នាក់ជាតិរបស់តិចណូ (គណិត, រូប, គីមី)"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋាភិបាល ១០០%", "អាហារូបករណ៍និស្សិតឆ្នើម AUF"],
+            related_majors: ["architecture", "mechanical_engineering"]
+          },
+          {
+            key: "architecture",
+            name_en: "Architecture & Urban Planning",
+            name_km: "ស្ថាបត្យកម្ម និងនគរូបនីយកម្ម",
+            tuition_per_year_usd: 600,
+            admission_requirements: ["ប្រឡងជាប់តិចណូ", "តេស្តគំនូរ និងការគិតលំហ"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋាភិបាល"],
+            related_majors: ["civil_engineering"]
+          }
+        ]
+      },
+      {
+        name_en: "Faculty of Electrical & Mechanical Engineering",
+        name_km: "ដេប៉ាតឺម៉ង់វិស្វកម្មអគ្គិសនី និងមេកានិច",
+        majors: [
+          {
+            key: "mechanical_engineering",
+            name_en: "Mechanical & Industrial Engineering",
+            name_km: "វិស្វកម្មមេកានិច និងឧស្សាហកម្ម (លំដាប់ #1 កម្ពុជា)",
+            tuition_per_year_usd: 500,
+            admission_requirements: ["ប្រឡងជាប់ថ្នាក់ជាតិរបស់តិចណូ"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋាភិបាល ១០០%"],
+            related_majors: ["civil_engineering"]
+          }
+        ]
+      },
+      {
+        name_en: "Faculty of Information and Communication Technology",
+        name_km: "ដេប៉ាតឺម៉ង់បច្ចេកវិទ្យាព័ត៌មាន និងសារគមនាគមន៍ (GIC)",
+        majors: [
+          {
+            key: "computer_science",
+            name_en: "Computer Science and Networking",
+            name_km: "វិទ្យាសាស្ត្រកុំព្យូទ័រ និងបណ្តាញ",
+            tuition_per_year_usd: 550,
+            admission_requirements: ["ប្រឡងជាប់ថ្នាក់ជាតិរបស់តិចណូ"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋាភិបាល"],
+            related_majors: ["software_engineering", "data_science"]
+          },
+          {
+            key: "software_engineering",
+            name_en: "Software Engineering",
+            name_km: "វិស្វកម្មកម្មវិធីកុំព្យូទ័រ",
+            tuition_per_year_usd: 550,
+            admission_requirements: ["ប្រឡងជាប់ថ្នាក់ជាតិរបស់តិចណូ"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋាភិបាល"],
+            related_majors: ["computer_science", "data_science"]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "rufa",
+    name_en: "Royal University of Fine Arts",
+    name_km: "សាកលវិទ្យាល័យភូមិន្ទវិចិត្រសិល្បៈ",
+    short_name: "RUFA",
+    location: "St 178, Daun Penh, Phnom Penh",
+    province: "Phnom Penh",
+    province_km: "រាជធានីភ្នំពេញ",
+    website: "https://www.rufa.edu.kh",
+    teaching_languages: ["Khmer", "French", "English"],
+    ranking: 1,
+    faculties: [
+      {
+        name_en: "Faculty of Architecture & Urbanism",
+        name_km: "មហាវិទ្យាល័យស្ថាបត្យកម្ម និងនគររូបនីយវិទ្យា",
+        majors: [
+          {
+            key: "architecture",
+            name_en: "Architecture",
+            name_km: "ស្ថាបត្យកម្ម (លំដាប់ #1 ប្រវត្តិសាស្ត្រកម្ពុជា)",
+            tuition_per_year_usd: 500,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប", "ប្រឡងតេស្តគូរគំនូរ និងរូបគណិតថ្នាក់ជាតិ RUFA"],
+            scholarships: ["អាហារូបករណ៍ក្រសួងវប្បធម៌ និងវិចិត្រសិល្បៈ ១០០%", "អាហារូបករណ៍រដ្ឋ"],
+            related_majors: ["graphic_design", "civil_engineering"]
+          }
+        ]
+      },
+      {
+        name_en: "Faculty of Visual Arts",
+        name_km: "មហាវិទ្យាល័យសិល្បៈសូនរូប",
+        majors: [
+          {
+            key: "graphic_design",
+            name_en: "Graphic Design & Visual Communication",
+            name_km: "ការរចនាក្រាហ្វិក និងសិល្បៈទំនាក់ទំនង (លំដាប់ #1 កម្ពុជា)",
+            tuition_per_year_usd: 450,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប", "ប្រឡងតេស្តទេពកោសល្យគំនូរ និងសិល្បៈ"],
+            scholarships: ["អាហារូបករណ៍ក្រសួងវប្បធម៌ ១០០%"],
+            related_majors: ["architecture"]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "cadt",
+    name_en: "Cambodia Academy of Digital Technology",
+    name_km: "បណ្ឌិត្យសភាបច្ចេកវិទ្យាឌីជីថលកម្ពុជា",
+    short_name: "CADT",
+    location: "National Road 6A, Prek Leap, Phnom Penh",
+    province: "Phnom Penh",
+    province_km: "រាជធានីភ្នំពេញ",
+    website: "https://www.cadt.edu.kh",
+    teaching_languages: ["English", "Khmer"],
+    ranking: 1,
+    faculties: [
+      {
+        name_en: "Institute of Digital Technology",
+        name_km: "វិទ្យាស្ថានបច្ចេកវិទ្យាឌីជីថល (IDT)",
+        majors: [
+          {
+            key: "software_engineering",
+            name_en: "Software Engineering",
+            name_km: "វិស្វកម្មកម្មវិធីកុំព្យូទ័រ (លំដាប់ #1 បច្ចេកវិទ្យា)",
+            tuition_per_year_usd: 1200,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប និទ្ទេស A/B/C", "ប្រឡងតេស្តគណិតវិទ្យា តក្កវិជ្ជា និងភាសាអង់គ្លេស"],
+            scholarships: ["អាហារូបករណ៍ទេពកោសល្យឌីជីថលតេជោ (Techo Digital 100%)", "អាហារូបករណ៍ស្ត្រីក្នុងបច្ចេកវិទ្យា"],
+            related_majors: ["computer_science", "data_science"]
+          },
+          {
+            key: "computer_science",
+            name_en: "Computer Science",
+            name_km: "វិទ្យាសាស្ត្រកុំព្យូទ័រ",
+            tuition_per_year_usd: 1200,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប", "ប្រឡងជាប់តេស្តចូលរៀន CADT"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋាភិបាល ១០០%"],
+            related_majors: ["software_engineering", "data_science"]
+          },
+          {
+            key: "data_science",
+            name_en: "Data Science & Artificial Intelligence",
+            name_km: "វិទ្យាសាស្ត្រទិន្នន័យ និងបញ្ញាសិប្បនិម្មិត (AI - លំដាប់ #1 កម្ពុជា)",
+            tuition_per_year_usd: 1400,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប និទ្ទេសគណិតវិទ្យាល្អ", "ប្រឡងតេស្ត CADT"],
+            scholarships: ["អាហារូបករណ៍ទេពកោសល្យឌីជីថល ១០០%"],
+            related_majors: ["computer_science", "software_engineering"]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "rule",
+    name_en: "Royal University of Law and Economics",
+    name_km: "សាកលវិទ្យាល័យភូមិន្ទនីតិសាស្ត្រ និងវិទ្យាសាស្ត្រសេដ្ឋកិច្ច",
+    short_name: "RULE",
+    location: "Monivong Blvd, Chamkarmon, Phnom Penh",
+    province: "Phnom Penh",
+    province_km: "រាជធានីភ្នំពេញ",
+    website: "https://www.rule.edu.kh",
+    teaching_languages: ["Khmer", "French", "English"],
+    ranking: 1,
+    faculties: [
+      {
+        name_en: "Faculty of Law",
+        name_km: "មហាវិទ្យាល័យនីតិសាស្ត្រ",
+        majors: [
+          {
+            key: "law",
+            name_en: "Law",
+            name_km: "នីតិសាស្ត្រ (ច្បាប់ - លំដាប់ #1 ជាតិកម្ពុជា)",
+            tuition_per_year_usd: 550,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប", "ប្រឡងចូលថ្នាក់ជាតិ ឬថ្នាក់បង់ថ្លៃ"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋាភិបាល ១០០%", "អាហារូបករណ៍កិត្តិយស"],
+            related_majors: ["international_relations"]
+          }
+        ]
+      },
+      {
+        name_en: "Faculty of Economics and Management",
+        name_km: "មហាវិទ្យាល័យសេដ្ឋកិច្ច និងគ្រប់គ្រង",
+        majors: [
+          {
+            key: "economics",
+            name_en: "Economics",
+            name_km: "វិទ្យាសាស្ត្រសេដ្ឋកិច្ច (លំដាប់ #1 កម្ពុជា)",
+            tuition_per_year_usd: 550,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋាភិបាល", "អាហារូបករណ៍សហប្រតិបត្តិការបារាំង"],
+            related_majors: ["accounting", "business_administration"]
+          },
+          {
+            key: "accounting",
+            name_en: "Accounting & Finance",
+            name_km: "គណនេយ្យ និងហិរញ្ញវត្ថុ",
+            tuition_per_year_usd: 550,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋាភិបាល"],
+            related_majors: ["economics", "business_administration"]
+          },
+          {
+            key: "business_administration",
+            name_en: "Business Administration",
+            name_km: "ការគ្រប់គ្រងពាណិជ្ជកម្ម",
+            tuition_per_year_usd: 550,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋ"],
+            related_majors: ["marketing", "accounting"]
+          },
+          {
+            key: "marketing",
+            name_en: "Marketing",
+            name_km: "ទីផ្សារ",
+            tuition_per_year_usd: 550,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋ"],
+            related_majors: ["business_administration"]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "num",
+    name_en: "National University of Management",
+    name_km: "សាកលវិទ្យាល័យជាតិគ្រប់គ្រង",
+    short_name: "NUM",
+    location: "St 96, Wat Phnom, Daun Penh, Phnom Penh",
+    province: "Phnom Penh",
+    province_km: "រាជធានីភ្នំពេញ",
+    website: "https://www.num.edu.kh",
+    teaching_languages: ["Khmer", "English"],
+    ranking: 1,
+    faculties: [
+      {
+        name_en: "Faculty of Management",
+        name_km: "មហាវិទ្យាល័យគ្រប់គ្រង",
+        majors: [
+          {
+            key: "business_administration",
+            name_en: "Business Administration & Management",
+            name_km: "ការគ្រប់គ្រងពាណិជ្ជកម្មទូទៅ (លំដាប់ #1 ស្ថាប័នរដ្ឋ)",
+            tuition_per_year_usd: 500,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋាភិបាល ១០០%", "អាហារូបករណ៍សហគ្រិនភាព"],
+            related_majors: ["marketing", "accounting"]
+          },
+          {
+            key: "marketing",
+            name_en: "Marketing & Digital Strategy",
+            name_km: "ទីផ្សារ និងយុទ្ធសាស្ត្រឌីជីថល (លំដាប់ #1)",
+            tuition_per_year_usd: 500,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋាភិបាល"],
+            related_majors: ["business_administration"]
+          },
+          {
+            key: "tourism_and_hospitality_management",
+            name_en: "Tourism & Hospitality Management",
+            name_km: "ទេសចរណ៍ និងបដិសណ្ឋារកិច្ច",
+            tuition_per_year_usd: 500,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋាភិបាល"],
+            related_majors: ["business_administration"]
+          }
+        ]
+      },
+      {
+        name_en: "Faculty of Finance and Accounting",
+        name_km: "មហាវិទ្យាល័យហិរញ្ញវត្ថុ និងគណនេយ្យ",
+        majors: [
+          {
+            key: "accounting",
+            name_en: "Accounting and Finance",
+            name_km: "គណនេយ្យ និងហិរញ្ញវត្ថុ",
+            tuition_per_year_usd: 520,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋាភិបាល"],
+            related_majors: ["economics", "business_administration"]
+          },
+          {
+            key: "economics",
+            name_en: "Applied Economics",
+            name_km: "សេដ្ឋកិច្ចអនុវត្ត",
+            tuition_per_year_usd: 500,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋាភិបាល"],
+            related_majors: ["accounting"]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "vanda",
+    name_en: "Vanda Institute",
+    name_km: "វិទ្យាស្ថានវ៉ាន់ដា",
+    short_name: "Vanda",
+    location: "Mao Tse Toung Blvd, Phnom Penh",
+    province: "Phnom Penh",
+    province_km: "រាជធានីភ្នំពេញ",
+    website: "https://www.vanda.edu.kh",
+    teaching_languages: ["Khmer", "English"],
+    ranking: 1,
+    faculties: [
+      {
+        name_en: "Faculty of Accounting and Finance",
+        name_km: "មហាវិទ្យាល័យគណនេយ្យ និងហិរញ្ញវត្ថុ",
+        majors: [
+          {
+            key: "accounting",
+            name_en: "Accounting & Auditing",
+            name_km: "គណនេយ្យ និងសវនកម្ម (ស្ថាប័នឯកទេសលំដាប់ #1 កម្ពុជា)",
+            tuition_per_year_usd: 600,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប", "ប្រឡងតេស្តគណិតវិទ្យា និងភាសាអង់គ្លេស"],
+            scholarships: ["អាហារូបករណ៍លោកគ្រូវ៉ាន់ដា", "អាហារូបករណ៍និស្សិតឆ្នើម"],
+            related_majors: ["business_administration", "economics"]
+          },
+          {
+            key: "business_administration",
+            name_en: "Business Administration",
+            name_km: "ការគ្រប់គ្រងពាណិជ្ជកម្ម",
+            tuition_per_year_usd: 580,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍និស្សិតឆ្នើម"],
+            related_majors: ["accounting", "marketing"]
+          },
+          {
+            key: "marketing",
+            name_en: "Marketing",
+            name_km: "ទីផ្សារ",
+            tuition_per_year_usd: 580,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍និស្សិតឆ្នើម"],
+            related_majors: ["business_administration"]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "uhs",
+    name_en: "University of Health Sciences",
+    name_km: "សាកលវិទ្យាល័យវិទ្យាសាស្ត្រសុខាភិបាល (សាលាក្រហម)",
+    short_name: "UHS",
+    location: "Monivong Blvd, Phnom Penh",
+    province: "Phnom Penh",
+    province_km: "រាជធានីភ្នំពេញ",
+    website: "https://www.uhs.edu.kh",
+    teaching_languages: ["Khmer", "French", "English"],
+    ranking: 1,
+    faculties: [
+      {
+        name_en: "Faculty of Nursing Sciences",
+        name_km: "មហាវិទ្យាល័យគិលានុបដ្ឋាក",
+        majors: [
+          {
+            key: "nursing",
+            name_en: "Bachelor of Science in Nursing",
+            name_km: "បរិញ្ញាបត្រវិទ្យាសាស្ត្រគិលានុបដ្ឋាក (លំដាប់ #1 ជាតិកម្ពុជា)",
+            tuition_per_year_usd: 800,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប (វិទ្យាសាស្ត្រពិត)", "ប្រឡងជាប់ការប្រឡងថ្នាក់ជាតិជ្រើសរើសនិស្សិតសុខាភិបាល"],
+            scholarships: ["អាហារូបករណ៍ក្រសួងសុខាភិបាល ១០០%", "អាហារូបករណ៍រដ្ឋ"],
+            related_majors: ["public_health"]
+          }
+        ]
+      },
+      {
+        name_en: "Faculty of Public Health",
+        name_km: "មហាវិទ្យាល័យសុខភាពសាធារណៈ",
+        majors: [
+          {
+            key: "public_health",
+            name_en: "Public Health",
+            name_km: "សុខភាពសាធារណៈ (លំដាប់ #1 កម្ពុជា)",
+            tuition_per_year_usd: 850,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប (វិទ្យាសាស្ត្រពិត)", "ប្រឡងជាប់ថ្នាក់ជាតិសុខាភិបាល"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋាភិបាល", "អាហារូបករណ៍អង្គការសុខភាពពិភពលោក WHO"],
+            related_majors: ["nursing"]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "rua",
+    name_en: "Royal University of Agriculture",
+    name_km: "សាកលវិទ្យាល័យភូមិន្ទកសិកម្ម (ចំការដូង)",
+    short_name: "RUA",
+    location: "Chamkar Daung, Dangkor, Phnom Penh",
+    province: "Phnom Penh",
+    province_km: "រាជធានីភ្នំពេញ",
+    website: "https://www.rua.edu.kh",
+    teaching_languages: ["Khmer", "English"],
+    ranking: 1,
+    faculties: [
+      {
+        name_en: "Faculty of Agronomy",
+        name_km: "មហាវិទ្យាល័យក្សេត្រសាស្ត្រ និងវិទ្យាសាស្ត្រកសិកម្ម",
+        majors: [
+          {
+            key: "agriculture",
+            name_en: "Agronomy and Agricultural Science",
+            name_km: "ក្សេត្រសាស្ត្រ និងវិទ្យាសាស្ត្រកសិកម្ម (លំដាប់ #1 កម្ពុជា)",
+            tuition_per_year_usd: 400,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប", "ប្រឡងចូលរៀនថ្នាក់ជាតិ"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋាភិបាល ១០០%", "អាហារូបករណ៍ដៃគូអន្តរជាតិ (JICA, USAID)"],
+            related_majors: ["environmental_science"]
+          },
+          {
+            key: "environmental_science",
+            name_en: "Agricultural Ecology & Environmental Science",
+            name_km: "បរិស្ថានវិទ្យាកសិកម្ម និងការគ្រប់គ្រងធនធានធម្មជាតិ",
+            tuition_per_year_usd: 400,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋាភិបាល ១០០%"],
+            related_majors: ["agriculture"]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "puc",
+    name_en: "Paññāsāstra University of Cambodia",
+    name_km: "សាកលវិទ្យាល័យបញ្ញាសាស្ត្រកម្ពុជា",
+    short_name: "PUC",
+    location: "Samdach Sothearos Blvd, Phnom Penh",
+    province: "Phnom Penh",
+    province_km: "រាជធានីភ្នំពេញ",
+    website: "https://www.puc.edu.kh",
+    teaching_languages: ["English"],
+    ranking: 2,
+    faculties: [
+      {
+        name_en: "Faculty of Social Sciences & International Relations",
+        name_km: "មហាវិទ្យាល័យសង្គមសាស្ត្រ និងទំនាក់ទំនងអន្តរជាតិ",
+        majors: [
+          {
+            key: "international_relations",
+            name_en: "International Relations & Diplomacy",
+            name_km: "ទំនាក់ទំនងអន្តរជាតិ និងការទូត (ភាសាអង់គ្លេស)",
+            tuition_per_year_usd: 1100,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប", "តេស្តភាសាអង់គ្លេស PUC EPT (Pass Level)"],
+            scholarships: ["អាហារូបករណ៍បណ្ឌិត កុល ផេង", "អាហារូបករណ៍អ្នកដឹកនាំវ័យក្មេង"],
+            related_majors: ["law"]
+          },
+          {
+            key: "psychology",
+            name_en: "Applied Psychology",
+            name_km: "ចិត្តវិទ្យាអនុវត្ត (កម្មវិធីអន្តរជាតិ)",
+            tuition_per_year_usd: 950,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប", "តេស្តភាសាអង់គ្លេស"],
+            scholarships: ["អាហារូបករណ៍ PUC"],
+            related_majors: ["education"]
+          },
+          {
+            key: "education",
+            name_en: "Education & TESOL",
+            name_km: "អប់រំ និងការបង្រៀនភាសាអង់គ្លេស (TESOL)",
+            tuition_per_year_usd: 900,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប", "តេស្តភាសាអង់គ្លេស"],
+            scholarships: ["អាហារូបករណ៍គ្រូបង្រៀន"],
+            related_majors: ["psychology"]
+          }
+        ]
+      },
+      {
+        name_en: "Faculty of Law & Public Affairs",
+        name_km: "មហាវិទ្យាល័យនីតិសាស្ត្រ និងកិច្ចការសាធារណៈ",
+        majors: [
+          {
+            key: "law",
+            name_en: "International Law",
+            name_km: "នីតិសាស្ត្រអន្តរជាតិ (ជាភាសាអង់គ្លេស)",
+            tuition_per_year_usd: 1100,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប", "តេស្តភាសាអង់គ្លេស"],
+            scholarships: ["អាហារូបករណ៍ PUC"],
+            related_majors: ["international_relations"]
+          }
+        ]
+      },
+      {
+        name_en: "Faculty of Business and Economics",
+        name_km: "មហាវិទ្យាល័យពាណិជ្ជកម្ម និងសេដ្ឋកិច្ច",
+        majors: [
+          {
+            key: "business_administration",
+            name_en: "Business Administration",
+            name_km: "ការគ្រប់គ្រងពាណិជ្ជកម្មអន្តរជាតិ",
+            tuition_per_year_usd: 950,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប", "តេស្តភាសាអង់គ្លេស"],
+            scholarships: ["អាហារូបករណ៍ PUC"],
+            related_majors: ["marketing", "accounting"]
+          },
+          {
+            key: "marketing",
+            name_en: "Global Marketing",
+            name_km: "ទីផ្សារសកល",
+            tuition_per_year_usd: 950,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប", "តេស្តភាសាអង់គ្លេស"],
+            scholarships: ["អាហារូបករណ៍ PUC"],
+            related_majors: ["business_administration"]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "setec",
+    name_en: "SETEC Institute",
+    name_km: "វិទ្យាស្ថានសេតភិក",
+    short_name: "SETEC",
+    location: "Kampuchea Krom Blvd, Phnom Penh",
+    province: "Phnom Penh",
+    province_km: "រាជធានីភ្នំពេញ",
+    website: "https://www.setecu.com",
+    teaching_languages: ["Khmer", "English"],
+    ranking: 2,
+    faculties: [
+      {
+        name_en: "Faculty of Design and Multimedia",
+        name_km: "មហាវិទ្យាល័យរចនា និងពហុប្រព័ន្ធផ្សព្វផ្សាយ",
+        majors: [
+          {
+            key: "graphic_design",
+            name_en: "Graphic Design & Digital Multimedia",
+            name_km: "ការរចនាក្រាហ្វិក និងពហុប្រព័ន្ធផ្សព្វផ្សាយ (ល្បីលំដាប់ #2)",
+            tuition_per_year_usd: 750,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប", "តេស្តចំណង់ចំណូលចិត្តផ្នែកឌីហ្សាញ"],
+            scholarships: ["អាហារូបករណ៍ទេពកោសល្យច្នៃប្រឌិត"],
+            related_majors: ["computer_science"]
+          }
+        ]
+      },
+      {
+        name_en: "Faculty of Computer Science and Engineering",
+        name_km: "មហាវិទ្យាល័យវិទ្យាសាស្ត្រកុំព្យូទ័រ និងវិស្វកម្ម",
+        majors: [
+          {
+            key: "computer_science",
+            name_en: "Computer Science (MIS / Networking)",
+            name_km: "វិទ្យាសាស្ត្រកុំព្យូទ័រ (MIS)",
+            tuition_per_year_usd: 750,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍និស្សិតឆ្នើម"],
+            related_majors: ["software_engineering"]
+          },
+          {
+            key: "software_engineering",
+            name_en: "Software & Mobile Application Engineering",
+            name_km: "វិស្វកម្មកម្មវិធី និងកម្មវិធីទូរស័ព្ទ",
+            tuition_per_year_usd: 780,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍និស្សិតឆ្នើម"],
+            related_majors: ["computer_science"]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "limkokwing",
+    name_en: "Limkokwing University of Creative Technology",
+    name_km: "សាកលវិទ្យាល័យលីមកុកវីងបច្ចេកវិទ្យាច្នៃប្រឌិត",
+    short_name: "Limkokwing",
+    location: "St 41, Tonle Bassac, Phnom Penh",
+    province: "Phnom Penh",
+    province_km: "រាជធានីភ្នំពេញ",
+    website: "https://www.limkokwing.net/cambodia",
+    teaching_languages: ["English"],
+    ranking: 3,
+    faculties: [
+      {
+        name_en: "Faculty of Design Innovation",
+        name_km: "មហាវិទ្យាល័យនវានុវត្តន៍ការរចនា",
+        majors: [
+          {
+            key: "graphic_design",
+            name_en: "Professional Graphic Design & Digital Media",
+            name_km: "ការរចនាក្រាហ្វិកអាជីព និងប្រព័ន្ធផ្សព្វផ្សាយឌីជីថល (លំដាប់ #3)",
+            tuition_per_year_usd: 1600,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប", "សម្ភាសន៍ និងបង្ហាញស្នាដៃ Portfolio"],
+            scholarships: ["អាហារូបករណ៍ភាពជាអ្នកដឹកនាំច្នៃប្រឌិត"],
+            related_majors: ["architecture"]
+          },
+          {
+            key: "architecture",
+            name_en: "Interior Architecture & Spatial Design",
+            name_km: "ស្ថាបត្យកម្មផ្ទៃក្នុង និងការរចនាលំហ",
+            tuition_per_year_usd: 1800,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប", "Portfolio គំនូរ"],
+            scholarships: ["អាហារូបករណ៍ឧបត្ថម្ភការសិក្សា"],
+            related_majors: ["graphic_design"]
+          }
+        ]
+      },
+      {
+        name_en: "Faculty of Information and Communication Technology",
+        name_km: "មហាវិទ្យាល័យបច្ចេកវិទ្យាព័ត៌មាន",
+        majors: [
+          {
+            key: "software_engineering",
+            name_en: "Software Engineering & Games Development",
+            name_km: "វិស្វកម្មកម្មវិធី និងការអភិវឌ្ឍហ្គេម",
+            tuition_per_year_usd: 1600,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍បច្ចេកវិទ្យា"],
+            related_majors: ["computer_science"]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "paragonu",
+    name_en: "Paragon International University",
+    name_km: "សាកលវិទ្យាល័យអន្តរជាតិផារ៉ាហ្កន",
+    short_name: "ParagonU",
+    location: "St 315, Boeng Kak 1, Tuol Kork, Phnom Penh",
+    province: "Phnom Penh",
+    province_km: "រាជធានីភ្នំពេញ",
+    website: "https://www.paragoniu.edu.kh",
+    teaching_languages: ["English"],
+    ranking: 2,
+    faculties: [
+      {
+        name_en: "Faculty of Engineering",
+        name_km: "មហាវិទ្យាល័យវិស្វកម្ម",
+        majors: [
+          {
+            key: "civil_engineering",
+            name_en: "Civil Engineering",
+            name_km: "វិស្វកម្មសំណង់ស៊ីវិល",
+            tuition_per_year_usd: 2400,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប", "ប្រឡងតេស្ត ParagonU (Math & English)"],
+            scholarships: ["អាហារូបករណ៍ប្រឡងប្រជែងថ្នាក់ជាតិរហូតដល់ ១០០%"],
+            related_majors: ["architecture"]
+          },
+          {
+            key: "architecture",
+            name_en: "Architecture",
+            name_km: "ស្ថាបត្យកម្ម",
+            tuition_per_year_usd: 2600,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប", "តេស្តគំនូរ និងភាសាអង់គ្លេស"],
+            scholarships: ["អាហារូបករណ៍ ១០០% និង ៥០% សម្រាប់និស្សិតឆ្នើម"],
+            related_majors: ["civil_engineering", "graphic_design"]
+          }
+        ]
+      },
+      {
+        name_en: "Faculty of Information and Computer Technologies",
+        name_km: "មហាវិទ្យាល័យបច្ចេកវិទ្យាព័ត៌មាន និងកុំព្យូទ័រ",
+        majors: [
+          {
+            key: "computer_science",
+            name_en: "Computer Science",
+            name_km: "វិទ្យាសាស្ត្រកុំព្យូទ័រ",
+            tuition_per_year_usd: 2400,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប", "តេស្ត ParagonU"],
+            scholarships: ["អាហារូបករណ៍ប្រឡងប្រជែងថ្នាក់ជាតិ"],
+            related_majors: ["software_engineering", "data_science"]
+          },
+          {
+            key: "software_engineering",
+            name_en: "Software Engineering",
+            name_km: "វិស្វកម្មកម្មវិធីកុំព្យូទ័រ",
+            tuition_per_year_usd: 2400,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប", "តេស្ត ParagonU"],
+            scholarships: ["អាហារូបករណ៍ប្រឡងប្រជែងថ្នាក់ជាតិ"],
+            related_majors: ["computer_science", "data_science"]
+          },
+          {
+            key: "data_science",
+            name_en: "Data Science",
+            name_km: "វិទ្យាសាស្ត្រទិន្នន័យ",
+            tuition_per_year_usd: 2500,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប", "តេស្តគណិតវិទ្យា ParagonU"],
+            scholarships: ["អាហារូបករណ៍ប្រឡងប្រជែង"],
+            related_majors: ["computer_science"]
+          }
+        ]
+      },
+      {
+        name_en: "Faculty of Economics and Administrative Sciences",
+        name_km: "មហាវិទ្យាល័យសេដ្ឋកិច្ច និងរដ្ឋបាល",
+        majors: [
+          {
+            key: "international_relations",
+            name_en: "International Relations",
+            name_km: "ទំនាក់ទំនងអន្តរជាតិ",
+            tuition_per_year_usd: 2200,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប", "តេស្តភាសាអង់គ្លេស"],
+            scholarships: ["អាហារូបករណ៍ ParagonU"],
+            related_majors: ["business_administration"]
+          },
+          {
+            key: "business_administration",
+            name_en: "Business Administration",
+            name_km: "ការគ្រប់គ្រងពាណិជ្ជកម្ម",
+            tuition_per_year_usd: 2200,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប", "តេស្តភាសាអង់គ្លេស"],
+            scholarships: ["អាហារូបករណ៍ ParagonU"],
+            related_majors: ["marketing", "accounting"]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "aupp",
+    name_en: "American University of Phnom Penh",
+    name_km: "សាកលវិទ្យាល័យអាមេរិកាំងភ្នំពេញ",
+    short_name: "AUPP",
+    location: "St 201R, Kroalkor, Russey Keo, Phnom Penh",
+    province: "Phnom Penh",
+    province_km: "រាជធានីភ្នំពេញ",
+    website: "https://www.aupp.edu.kh",
+    teaching_languages: ["English"],
+    ranking: 1,
+    faculties: [
+      {
+        name_en: "School of Digital Technologies",
+        name_km: "សាលាបច្ចេកវិទ្យាឌីជីថល (សហការជាមួយសាកលវិទ្យាល័យ Fort Hays & Arizona)",
+        majors: [
+          {
+            key: "software_engineering",
+            name_en: "Software Development & Engineering (Dual Degree)",
+            name_km: "វិស្វកម្ម និងអភិវឌ្ឍន៍កម្មវិធីកុំព្យូទ័រ (សញ្ញាបត្រអាមេរិក)",
+            tuition_per_year_usd: 6000,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប និទ្ទេសល្អ", "តេស្តភាសាអង់គ្លេស IELTS 6.0+ ឬ AUPP English Proficiency"],
+            scholarships: ["អាហារូបករណ៍ឧត្តមភាព AUPP រហូតដល់ ១០០%"],
+            related_majors: ["computer_science", "data_science"]
+          },
+          {
+            key: "computer_science",
+            name_en: "Computer Science (Cybersecurity / Cloud)",
+            name_km: "វិទ្យាសាស្ត្រកុំព្យូទ័រ (សន្តិសុខសាយប័រ)",
+            tuition_per_year_usd: 6000,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប", "តេស្តភាសាអង់គ្លេស"],
+            scholarships: ["អាហារូបករណ៍ថ្នាក់ជាតិ AUPP"],
+            related_majors: ["software_engineering"]
+          },
+          {
+            key: "data_science",
+            name_en: "Information Technology Management & Data Analytics",
+            name_km: "ការគ្រប់គ្រងព័ត៌មានវិទ្យា និងវិភាគទិន្នន័យ",
+            tuition_per_year_usd: 6000,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប", "តេស្តភាសាអង់គ្លេស"],
+            scholarships: ["អាហារូបករណ៍ឧត្តមភាព"],
+            related_majors: ["computer_science"]
+          }
+        ]
+      },
+      {
+        name_en: "School of Business & Social Sciences",
+        name_km: "សាលាធុរកិច្ច និងសង្គមសាស្ត្រ",
+        majors: [
+          {
+            key: "business_administration",
+            name_en: "Business Administration (Dual Degree)",
+            name_km: "ការគ្រប់គ្រងពាណិជ្ជកម្ម (សញ្ញាបត្រពីសហរដ្ឋអាមេរិក)",
+            tuition_per_year_usd: 5500,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប", "តេស្តភាសាអង់គ្លេស"],
+            scholarships: ["អាហារូបករណ៍ថ្នាក់ដឹកនាំធុរកិច្ច"],
+            related_majors: ["economics", "marketing"]
+          },
+          {
+            key: "international_relations",
+            name_en: "Global Affairs & International Relations",
+            name_km: "កិច្ចការសកល និងទំនាក់ទំនងអន្តរជាតិ",
+            tuition_per_year_usd: 5500,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប", "តេស្តភាសាអង់គ្លេស"],
+            scholarships: ["អាហារូបករណ៍ AUPP"],
+            related_majors: ["law"]
+          },
+          {
+            key: "law",
+            name_en: "Pre-Law & Legal Studies",
+            name_km: "នីតិសាស្ត្រ និងការសិក្សាច្បាប់",
+            tuition_per_year_usd: 5500,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប", "តេស្តភាសាអង់គ្លេស"],
+            scholarships: ["អាហារូបករណ៍ AUPP"],
+            related_majors: ["international_relations"]
+          },
+          {
+            key: "economics",
+            name_en: "Economics & Finance",
+            name_km: "សេដ្ឋកិច្ច និងហិរញ្ញវត្ថុ",
+            tuition_per_year_usd: 5500,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប", "តេស្តភាសាអង់គ្លេស"],
+            scholarships: ["អាហារូបករណ៍ AUPP"],
+            related_majors: ["business_administration"]
+          }
+        ]
+      },
+      {
+        name_en: "School of Architecture",
+        name_km: "សាលាស្ថាបត្យកម្ម",
+        majors: [
+          {
+            key: "architecture",
+            name_en: "Architecture & Environmental Design",
+            name_km: "ស្ថាបត្យកម្ម និងការរចនាបរិស្ថាន",
+            tuition_per_year_usd: 6000,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប", "តេស្តភាសាអង់គ្លេស និង Portfolio"],
+            scholarships: ["អាហារូបករណ៍ស្ថាបត្យករឆ្នើម"],
+            related_majors: ["civil_engineering"]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "npic",
+    name_en: "National Polytechnic Institute of Cambodia",
+    name_km: "វិទ្យាស្ថានជាតិពហុបច្ចេកទេសកម្ពុជា",
+    short_name: "NPIC",
+    location: "Sangkat Prey Sar, Khan Dangkao, Phnom Penh",
+    province: "Phnom Penh",
+    province_km: "រាជធានីភ្នំពេញ",
+    website: "https://www.npic.edu.kh",
+    teaching_languages: ["Khmer", "English"],
+    ranking: 2,
+    faculties: [
+      {
+        name_en: "Faculty of Civil Engineering & Architecture",
+        name_km: "មហាវិទ្យាល័យវិស្វកម្មសំណង់ស៊ីវិល",
+        majors: [
+          {
+            key: "civil_engineering",
+            name_en: "Civil and Construction Engineering",
+            name_km: "វិស្វកម្មសំណង់ស៊ីវិល និងសំណង់អាគារ (លំដាប់ #2 ស្ថាប័នរដ្ឋ)",
+            tuition_per_year_usd: 500,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប (វិទ្យាសាស្ត្រពិត)"],
+            scholarships: ["អាហារូបករណ៍ក្រសួងការងារ និងបណ្តុះបណ្តាលវិជ្ជាជីវៈ ១០០%"],
+            related_majors: ["mechanical_engineering"]
+          }
+        ]
+      },
+      {
+        name_en: "Faculty of Mechanical Engineering",
+        name_km: "មហាវិទ្យាល័យវិស្វកម្មមេកានិច",
+        majors: [
+          {
+            key: "mechanical_engineering",
+            name_en: "Mechanical & Automotive Engineering",
+            name_km: "វិស្វកម្មមេកានិច និងយានយន្ត (លំដាប់ #2 កម្ពុជា)",
+            tuition_per_year_usd: 500,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋាភិបាល ១០០%"],
+            related_majors: ["civil_engineering"]
+          }
+        ]
+      },
+      {
+        name_en: "Faculty of Computer Science",
+        name_km: "មហាវិទ្យាល័យវិទ្យាសាស្ត្រកុំព្យូទ័រ",
+        majors: [
+          {
+            key: "computer_science",
+            name_en: "Computer Science & IT Infrastructure",
+            name_km: "វិទ្យាសាស្ត្រកុំព្យូទ័រ និងបណ្តាញ",
+            tuition_per_year_usd: 500,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋាភិបាល"],
+            related_majors: ["software_engineering"]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "norton",
+    name_en: "Norton University",
+    name_km: "សាកលវិទ្យាល័យន័រតុន",
+    short_name: "Norton",
+    location: "Chroy Changvar, Phnom Penh",
+    province: "Phnom Penh",
+    province_km: "រាជធានីភ្នំពេញ",
+    website: "https://www.norton-u.com",
+    teaching_languages: ["Khmer", "English"],
+    ranking: 3,
+    faculties: [
+      {
+        name_en: "Faculty of Civil Engineering and Architecture",
+        name_km: "មហាវិទ្យាល័យវិស្វកម្មសំណង់ស៊ីវិល និងស្ថាបត្យកម្ម",
+        majors: [
+          {
+            key: "civil_engineering",
+            name_en: "Civil Engineering",
+            name_km: "វិស្វកម្មសំណង់ស៊ីវិល (លំដាប់ #3)",
+            tuition_per_year_usd: 800,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍និស្សិតឆ្នើម"],
+            related_majors: ["architecture"]
+          },
+          {
+            key: "architecture",
+            name_en: "Architecture",
+            name_km: "ស្ថាបត្យកម្ម (លំដាប់ #3)",
+            tuition_per_year_usd: 900,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប", "តេស្តគំនូរមូលដ្ឋាន"],
+            scholarships: ["អាហារូបករណ៍លើកទឹកចិត្ត"],
+            related_majors: ["civil_engineering", "graphic_design"]
+          },
+          {
+            key: "mechanical_engineering",
+            name_en: "Mechanical Engineering",
+            name_km: "វិស្វកម្មមេកានិច (លំដាប់ #3)",
+            tuition_per_year_usd: 800,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ន័រតុន"],
+            related_majors: ["civil_engineering"]
+          }
+        ]
+      },
+      {
+        name_en: "Faculty of Computer Science",
+        name_km: "មហាវិទ្យាល័យវិទ្យាសាស្ត្រកុំព្យូទ័រ",
+        majors: [
+          {
+            key: "computer_science",
+            name_en: "Computer Science & Software Development",
+            name_km: "វិទ្យាសាស្ត្រកុំព្យូទ័រ",
+            tuition_per_year_usd: 750,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ន័រតុន"],
+            related_majors: ["software_engineering"]
+          },
+          {
+            key: "software_engineering",
+            name_en: "Software Engineering",
+            name_km: "វិស្វកម្មកម្មវិធីកុំព្យូទ័រ",
+            tuition_per_year_usd: 750,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ន័រតុន"],
+            related_majors: ["computer_science"]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "uc",
+    name_en: "The University of Cambodia",
+    name_km: "សាកលវិទ្យាល័យកម្ពុជា",
+    short_name: "UC",
+    location: "Northbridge Road, Sen Sok, Phnom Penh",
+    province: "Phnom Penh",
+    province_km: "រាជធានីភ្នំពេញ",
+    website: "https://www.uc.edu.kh",
+    teaching_languages: ["English", "Khmer"],
+    ranking: 3,
+    faculties: [
+      {
+        name_en: "Techo Sen School of Government and International Relations",
+        name_km: "សាលារដ្ឋាភិបាល និងទំនាក់ទំនងអន្តរជាតិតេជោសែន",
+        majors: [
+          {
+            key: "international_relations",
+            name_en: "International Relations & Diplomacy",
+            name_km: "ទំនាក់ទំនងអន្តរជាតិ និងការទូត (លំដាប់ #3)",
+            tuition_per_year_usd: 850,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប", "តេស្តភាសាអង់គ្លេស"],
+            scholarships: ["អាហារូបករណ៍សម្តេចតេជោ ហ៊ុន សែន ១០០%", "អាហារូបករណ៍ UC"],
+            related_majors: ["law"]
+          },
+          {
+            key: "law",
+            name_en: "Law & Comparative Jurisprudence",
+            name_km: "នីតិសាស្ត្រ និងច្បាប់ប្រៀបធៀប (លំដាប់ #3)",
+            tuition_per_year_usd: 850,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍សម្តេចតេជោ"],
+            related_majors: ["international_relations"]
+          }
+        ]
+      },
+      {
+        name_en: "School of Social Sciences",
+        name_km: "សាលាសង្គមសាស្ត្រ",
+        majors: [
+          {
+            key: "psychology",
+            name_en: "Psychology & Behavioral Sciences",
+            name_km: "ចិត្តវិទ្យា និងវិទ្យាសាស្ត្រឥរិយាបថ (លំដាប់ #3)",
+            tuition_per_year_usd: 800,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ UC"],
+            related_majors: ["education"]
+          },
+          {
+            key: "education",
+            name_en: "Education Leadership & Pedagogy",
+            name_km: "ភាពជាអ្នកដឹកនាំអប់រំ និងគរុកោសល្យ (លំដាប់ #3)",
+            tuition_per_year_usd: 750,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ UC"],
+            related_majors: ["psychology"]
+          }
+        ]
+      },
+      {
+        name_en: "School of Business",
+        name_km: "សាលាពាណិជ្ជកម្ម",
+        majors: [
+          {
+            key: "business_administration",
+            name_en: "Business Administration",
+            name_km: "ការគ្រប់គ្រងពាណិជ្ជកម្ម",
+            tuition_per_year_usd: 800,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ UC"],
+            related_majors: ["marketing", "accounting"]
+          },
+          {
+            key: "economics",
+            name_en: "Economics",
+            name_km: "សេដ្ឋកិច្ច",
+            tuition_per_year_usd: 800,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ UC"],
+            related_majors: ["business_administration"]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "up",
+    name_en: "University of Puthisastra",
+    name_km: "សាកលវិទ្យាល័យពុទ្ធិសាស្ត្រ",
+    short_name: "UP",
+    location: "St 180 & 184, Boeung Raing, Daun Penh, Phnom Penh",
+    province: "Phnom Penh",
+    province_km: "រាជធានីភ្នំពេញ",
+    website: "https://www.puthisastra.edu.kh",
+    teaching_languages: ["English", "Khmer"],
+    ranking: 2,
+    faculties: [
+      {
+        name_en: "Faculty of Nursing and Midwifery",
+        name_km: "មហាវិទ្យាល័យគិលានុបដ្ឋាក និងឆ្មប",
+        majors: [
+          {
+            key: "nursing",
+            name_en: "Bachelor of Science in Nursing (BSN)",
+            name_km: "បរិញ្ញាបត្រវិទ្យាសាស្ត្រគិលានុបដ្ឋាក (លំដាប់ #2 ស្តង់ដារអន្តរជាតិ)",
+            tuition_per_year_usd: 1400,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប (វិទ្យាសាស្ត្រពិត)", "តេស្តភាសាអង់គ្លេស និងការសម្ភាសន៍"],
+            scholarships: ["អាហារូបករណ៍ថែទាំសុខភាព UP", "អាហារូបករណ៍និស្សិតឆ្នើម"],
+            related_majors: ["public_health"]
+          }
+        ]
+      },
+      {
+        name_en: "Faculty of Health Sciences & Public Health",
+        name_km: "មហាវិទ្យាល័យវិទ្យាសាស្ត្រសុខាភិបាល និងសុខភាពសាធារណៈ",
+        majors: [
+          {
+            key: "public_health",
+            name_en: "Public Health & Health Innovation",
+            name_km: "សុខភាពសាធារណៈ និងនវានុវត្តន៍សុខាភិបាល (លំដាប់ #3)",
+            tuition_per_year_usd: 1300,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ UP"],
+            related_majors: ["nursing"]
+          }
+        ]
+      },
+      {
+        name_en: "Faculty of Information Technology",
+        name_km: "មហាវិទ្យាល័យបច្ចេកវិទ្យាព័ត៌មាន",
+        majors: [
+          {
+            key: "computer_science",
+            name_en: "Computer Science & Health Tech",
+            name_km: "វិទ្យាសាស្ត្រកុំព្យូទ័រ និងបច្ចេកវិទ្យាសុខាភិបាល",
+            tuition_per_year_usd: 1200,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍បច្ចេកវិទ្យា UP"],
+            related_majors: ["software_engineering"]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "iu",
+    name_en: "International University",
+    name_km: "សាកលវិទ្យាល័យអន្តរជាតិ",
+    short_name: "IU",
+    location: "St 1985, Phnom Penh Thmey, Sen Sok, Phnom Penh",
+    province: "Phnom Penh",
+    province_km: "រាជធានីភ្នំពេញ",
+    website: "https://www.iu.edu.kh",
+    teaching_languages: ["Khmer", "English"],
+    ranking: 3,
+    faculties: [
+      {
+        name_en: "Faculty of Nursing Sciences",
+        name_km: "មហាវិទ្យាល័យវិទ្យាសាស្ត្រគិលានុបដ្ឋាក",
+        majors: [
+          {
+            key: "nursing",
+            name_en: "Nursing",
+            name_km: "គិលានុបដ្ឋាក (លំដាប់ #3)",
+            tuition_per_year_usd: 1100,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ IU"],
+            related_majors: ["public_health"]
+          }
+        ]
+      },
+      {
+        name_en: "Faculty of Public Health",
+        name_km: "មហាវិទ្យាល័យសុខភាពសាធារណៈ",
+        majors: [
+          {
+            key: "public_health",
+            name_en: "Public Health",
+            name_km: "សុខភាពសាធារណៈ (លំដាប់ #2)",
+            tuition_per_year_usd: 1000,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ IU"],
+            related_majors: ["nursing"]
+          }
+        ]
+      },
+      {
+        name_en: "Faculty of Agriculture & Rural Development",
+        name_km: "មហាវិទ្យាល័យកសិកម្ម និងអភិវឌ្ឍន៍ជនបទ",
+        majors: [
+          {
+            key: "agriculture",
+            name_en: "Agriculture & Rural Development",
+            name_km: "កសិកម្ម និងអភិវឌ្ឍន៍ជនបទ",
+            tuition_per_year_usd: 700,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ IU"],
+            related_majors: ["environmental_science"]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "beltei",
+    name_en: "Beltei International University",
+    name_km: "សាកលវិទ្យាល័យ ប៊ែលធី អន្តរជាតិ",
+    short_name: "Beltei",
+    location: "Tuol Sleng / Choam Chao / St 217, Phnom Penh",
+    province: "Phnom Penh",
+    province_km: "រាជធានីភ្នំពេញ",
+    website: "https://www.beltei.edu.kh",
+    teaching_languages: ["Khmer", "English"],
+    ranking: 3,
+    faculties: [
+      {
+        name_en: "Faculty of Education, Arts & Humanities",
+        name_km: "មហាវិទ្យាល័យអប់រំ សិល្បៈ និងមនុស្សសាស្ត្រ",
+        majors: [
+          {
+            key: "education",
+            name_en: "Educational Science & Teaching",
+            name_km: "វិទ្យាសាស្ត្រអប់រំ និងការបង្រៀន",
+            tuition_per_year_usd: 650,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ប៊ែលធី"],
+            related_majors: ["psychology"]
+          },
+          {
+            key: "psychology",
+            name_en: "Educational Psychology",
+            name_km: "ចិត្តវិទ្យាអប់រំ",
+            tuition_per_year_usd: 650,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ប៊ែលធី"],
+            related_majors: ["education"]
+          }
+        ]
+      },
+      {
+        name_en: "Faculty of Law and International Relations",
+        name_km: "មហាវិទ្យាល័យនីតិសាស្ត្រ និងទំនាក់ទំនងអន្តរជាតិ",
+        majors: [
+          {
+            key: "law",
+            name_en: "Law",
+            name_km: "នីតិសាស្ត្រ",
+            tuition_per_year_usd: 650,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ប៊ែលធី"],
+            related_majors: ["international_relations"]
+          },
+          {
+            key: "international_relations",
+            name_en: "International Relations",
+            name_km: "ទំនាក់ទំនងអន្តរជាតិ",
+            tuition_per_year_usd: 650,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ប៊ែលធី"],
+            related_majors: ["law"]
+          }
+        ]
+      },
+      {
+        name_en: "Faculty of Business Administration and Tourism",
+        name_km: "មហាវិទ្យាល័យគ្រប់គ្រងពាណិជ្ជកម្ម និងទេសចរណ៍",
+        majors: [
+          {
+            key: "business_administration",
+            name_en: "Business Administration",
+            name_km: "ការគ្រប់គ្រងពាណិជ្ជកម្ម",
+            tuition_per_year_usd: 650,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ប៊ែលធី"],
+            related_majors: ["marketing", "accounting"]
+          },
+          {
+            key: "marketing",
+            name_en: "Marketing",
+            name_km: "ទីផ្សារ",
+            tuition_per_year_usd: 650,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ប៊ែលធី"],
+            related_majors: ["business_administration"]
+          },
+          {
+            key: "accounting",
+            name_en: "Accounting and Finance",
+            name_km: "គណនេយ្យ និងហិរញ្ញវត្ថុ",
+            tuition_per_year_usd: 650,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ប៊ែលធី"],
+            related_majors: ["business_administration"]
+          },
+          {
+            key: "tourism_and_hospitality_management",
+            name_en: "Tourism and Hospitality Management",
+            name_km: "ទេសចរណ៍ និងបដិសណ្ឋារកិច្ច",
+            tuition_per_year_usd: 650,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ប៊ែលធី"],
+            related_majors: ["business_administration"]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "camed",
+    name_en: "CamEd Business School",
+    name_km: "វិទ្យាស្ថានខេមអេដ",
+    short_name: "CamEd",
+    location: "St 108, Wat Phnom, Phnom Penh",
+    province: "Phnom Penh",
+    province_km: "រាជធានីភ្នំពេញ",
+    website: "https://www.cam-ed.com",
+    teaching_languages: ["English"],
+    ranking: 1,
+    faculties: [
+      {
+        name_en: "School of Accounting and Finance",
+        name_km: "សាលាគណនេយ្យ និងហិរញ្ញវត្ថុ (ACCA / CAT)",
+        majors: [
+          {
+            key: "accounting",
+            name_en: "Accounting and Finance (BA + CAT/ACCA UK)",
+            name_km: "គណនេយ្យ និងហិរញ្ញវត្ថុ (លំដាប់ #2 ស្តង់ដារអន្តរជាតិ ACCA)",
+            tuition_per_year_usd: 2800,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប និទ្ទេសល្អ", "តេស្តគណិតវិទ្យា និងភាសាអង់គ្លេស CamEd Placement"],
+            scholarships: ["អាហារូបករណ៍និស្សិតឆ្នើម ACCA", "អាហារូបករណ៍ផ្អែកលើសមត្ថភាព"],
+            related_majors: ["economics", "business_administration"]
+          },
+          {
+            key: "economics",
+            name_en: "Finance and Applied Economics",
+            name_km: "ហិរញ្ញវត្ថុ និងសេដ្ឋកិច្ចអនុវត្ត",
+            tuition_per_year_usd: 2800,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប", "តេស្ត CamEd"],
+            scholarships: ["អាហារូបករណ៍ CamEd"],
+            related_majors: ["accounting", "business_administration"]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "camtech",
+    name_en: "Cambodia University of Technology and Science",
+    name_km: "សាកលវិទ្យាល័យបច្ចេកវិទ្យា និងវិទ្យាសាស្ត្រកម្ពុជា",
+    short_name: "CamTech",
+    location: "Chroy Changvar Satellite City, Phnom Penh",
+    province: "Phnom Penh",
+    province_km: "រាជធានីភ្នំពេញ",
+    website: "https://www.camtech.edu.kh",
+    teaching_languages: ["English"],
+    ranking: 2,
+    faculties: [
+      {
+        name_en: "Faculty of Applied Science and Computing",
+        name_km: "មហាវិទ្យាល័យវិទ្យាសាស្ត្រអនុវត្ត និងកុំព្យូទ័រ",
+        majors: [
+          {
+            key: "data_science",
+            name_en: "Data Science and AI",
+            name_km: "វិទ្យាសាស្ត្រទិន្នន័យ និងបញ្ញាសិប្បនិម្មិត (លំដាប់ #2)",
+            tuition_per_year_usd: 1800,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប (វិទ្យាសាស្ត្រ)", "តេស្តភាសាអង់គ្លេស និងគណិត"],
+            scholarships: ["អាហារូបករណ៍ CamTech STEM ១០០%"],
+            related_majors: ["computer_science", "software_engineering"]
+          },
+          {
+            key: "software_engineering",
+            name_en: "Software Engineering & Cyber Security",
+            name_km: "វិស្វកម្មកម្មវិធី និងសន្តិសុខសាយប័រ",
+            tuition_per_year_usd: 1800,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប", "តេស្ត CamTech"],
+            scholarships: ["អាហារូបករណ៍ STEM"],
+            related_majors: ["computer_science"]
+          },
+          {
+            key: "mechanical_engineering",
+            name_en: "Robotics and Automation Engineering",
+            name_km: "វិស្វកម្មមនុស្សយន្ត និងស្វ័យប្រវត្តិកម្ម",
+            tuition_per_year_usd: 1800,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ STEM"],
+            related_majors: ["civil_engineering"]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "nie",
+    name_en: "National Institute of Education",
+    name_km: "វិទ្យាស្ថានជាតិអប់រំ",
+    short_name: "NIE",
+    location: "Preah Norodom Blvd, Phnom Penh",
+    province: "Phnom Penh",
+    province_km: "រាជធានីភ្នំពេញ",
+    website: "https://www.nie.edu.kh",
+    teaching_languages: ["Khmer", "French"],
+    ranking: 1,
+    faculties: [
+      {
+        name_en: "Faculty of Pedagogy and Educational Sciences",
+        name_km: "មហាវិទ្យាល័យគរុកោសល្យ និងវិទ្យាសាស្ត្រអប់រំ",
+        majors: [
+          {
+            key: "education",
+            name_en: "Education Sciences and Pedagogy",
+            name_km: "វិទ្យាសាស្ត្រអប់រំ និងគរុកោសល្យ (គ្រឹះស្ថានបណ្តុះបណ្តាលគ្រូកម្រិតឧត្តម #1)",
+            tuition_per_year_usd: 0,
+            admission_requirements: ["សញ្ញាបត្របរិញ្ញាបត្រ ឬបាក់ឌុប", "ប្រឡងជ្រើសរើសក្របខណ្ឌគ្រូបង្រៀនថ្នាក់ជាតិ"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋាភិបាល ១០០% (មានប្រាក់ឧបត្ថម្ភប្រចាំខែ)"],
+            related_majors: ["psychology"]
+          }
+        ]
+      }
+    ]
+  },
+
+  // ─────────────────────────────────────────────
+  // 2. Kandal (ខេត្តកណ្តាល)
+  // ─────────────────────────────────────────────
+  {
+    id: "plnia",
+    name_en: "Prek Leap National Institute of Agriculture",
+    name_km: "វិទ្យាស្ថានជាតិកសិកម្មព្រែកលៀប",
+    short_name: "PLNIA",
+    location: "National Road 6A, Prek Leap, Kandal / Phnom Penh border",
+    province: "Kandal",
+    province_km: "ខេត្តកណ្តាល",
+    website: "https://www.pna.edu.kh",
+    teaching_languages: ["Khmer", "English"],
+    ranking: 2,
+    faculties: [
+      {
+        name_en: "Faculty of Agricultural Technology & Environment",
+        name_km: "មហាវិទ្យាល័យបច្ចេកវិទ្យាកសិកម្ម និងបរិស្ថាន",
+        majors: [
+          {
+            key: "agriculture",
+            name_en: "Agronomy and Agribusiness",
+            name_km: "ក្សេត្រសាស្ត្រ និងធុរកិច្ចកសិកម្ម (លំដាប់ #2 កម្ពុជា)",
+            tuition_per_year_usd: 380,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋាភិបាល ១០០%", "អាហារូបករណ៍ក្រសួងកសិកម្ម"],
+            related_majors: ["environmental_science"]
+          },
+          {
+            key: "environmental_science",
+            name_en: "Environmental Management & Natural Resources",
+            name_km: "ការគ្រប់គ្រងបរិស្ថាន និងធនធានធម្មជាតិ (លំដាប់ #3)",
+            tuition_per_year_usd: 380,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋាភិបាល"],
+            related_majors: ["agriculture"]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "kpti",
+    name_en: "Kandal Polytechnic Institute",
+    name_km: "វិទ្យាស្ថានពហុបច្ចេកទេសខេត្តកណ្តាល",
+    short_name: "KPTI",
+    location: "Ta Khmau, Kandal Province",
+    province: "Kandal",
+    province_km: "ខេត្តកណ្តាល",
+    website: "https://www.kpti.edu.kh",
+    teaching_languages: ["Khmer"],
+    ranking: 3,
+    faculties: [
+      {
+        name_en: "Department of Engineering & ICT",
+        name_km: "ដេប៉ាតឺម៉ង់វិស្វកម្ម និងព័ត៌មានវិទ្យា",
+        majors: [
+          {
+            key: "civil_engineering",
+            name_en: "Civil Construction Technology",
+            name_km: "បច្ចេកវិទ្យាសំណង់ស៊ីវិល",
+            tuition_per_year_usd: 350,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប ឬសញ្ញាបត្របច្ចេកទេសកម្រិត៣"],
+            scholarships: ["អាហារូបករណ៍បណ្តុះបណ្តាលបច្ចេកទេស ១.៥លាននាក់"],
+            related_majors: ["mechanical_engineering"]
+          },
+          {
+            key: "computer_science",
+            name_en: "Computer Applications and Networking",
+            name_km: "ព័ត៌មានវិទ្យា និងបណ្តាញកុំព្យូទ័រ",
+            tuition_per_year_usd: 350,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ក្រសួងការងារ"],
+            related_majors: ["software_engineering"]
+          }
+        ]
+      }
+    ]
+  },
+
+  // ─────────────────────────────────────────────
+  // 3. Kampong Speu (ខេត្តកំពង់ស្ពឺ)
+  // ─────────────────────────────────────────────
+  {
+    id: "kit",
+    name_en: "Kirirom Institute of Technology",
+    name_km: "វិទ្យាស្ថានបច្ចេកវិទ្យាគិរីរម្យ",
+    short_name: "KIT",
+    location: "Kirirom National Park, Phnom Sruoch, Kampong Speu",
+    province: "Kampong Speu",
+    province_km: "ខេត្តកំពង់ស្ពឺ",
+    website: "https://www.kit.edu.kh",
+    teaching_languages: ["English"],
+    ranking: 1,
+    faculties: [
+      {
+        name_en: "Department of Software Engineering",
+        name_km: "ដេប៉ាតឺម៉ង់វិស្វកម្មកម្មវិធី (អាហារូបករណ៍ ១០០% ស្នាក់នៅ និងហូបចុក)",
+        majors: [
+          {
+            key: "software_engineering",
+            name_en: "Software Engineering",
+            name_km: "វិស្វកម្មកម្មវិធីកុំព្យូទ័រ (លំដាប់ #2 កម្ពុជា)",
+            tuition_per_year_usd: 0,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប", "ប្រឡងតេស្តគណិតវិទ្យា កូដកម្ម និងសម្ភាសន៍ភាសាអង់គ្លេស"],
+            scholarships: ["អាហារូបករណ៍ ១០០% រួមបញ្ចូលថ្លៃសិក្សា កន្លែងស្នាក់នៅ និងអាហារ"],
+            related_majors: ["computer_science", "data_science"]
+          },
+          {
+            key: "computer_science",
+            name_en: "Computer Science & Cloud Systems",
+            name_km: "វិទ្យាសាស្ត្រកុំព្យូទ័រ និងប្រព័ន្ធក្លោដ",
+            tuition_per_year_usd: 0,
+            admission_requirements: ["ប្រឡងជាប់ការជ្រើសរើស KIT"],
+            scholarships: ["អាហារូបករណ៍ពេញលេញ ១០០%"],
+            related_majors: ["software_engineering"]
+          }
+        ]
+      },
+      {
+        name_en: "Department of Tourism & Hospitality",
+        name_km: "ដេប៉ាតឺម៉ង់ទេសចរណ៍ និងបដិសណ្ឋារកិច្ច",
+        majors: [
+          {
+            key: "tourism_and_hospitality_management",
+            name_en: "Eco-Tourism and Hospitality Management",
+            name_km: "ទេសចរណ៍ធម្មជាតិ និងការគ្រប់គ្រងបដិសណ្ឋារកិច្ច",
+            tuition_per_year_usd: 0,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប", "តេស្តភាសាអង់គ្លេស"],
+            scholarships: ["អាហារូបករណ៍ពេញលេញ ១០០%"],
+            related_majors: ["business_administration"]
+          },
+          {
+            key: "architecture",
+            name_en: "Eco-Architecture and Sustainable Design",
+            name_km: "ស្ថាបត្យកម្មធម្មជាតិ និងការរចនាប្រកបដោយនិរន្តរភាព",
+            tuition_per_year_usd: 0,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប", "តេស្តគំនូរ និងភាសាអង់គ្លេស"],
+            scholarships: ["អាហារូបករណ៍ ១០០%"],
+            related_majors: ["civil_engineering"]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "ksit",
+    name_en: "Kampong Speu Institute of Technology",
+    name_km: "វិទ្យាស្ថានបច្ចេកវិទ្យាកំពង់ស្ពឺ",
+    short_name: "KSIT",
+    location: "Chbar Mon, Kampong Speu Province",
+    province: "Kampong Speu",
+    province_km: "ខេត្តកំពង់ស្ពឺ",
+    website: "https://www.ksit.edu.kh",
+    teaching_languages: ["Khmer"],
+    ranking: 3,
+    faculties: [
+      {
+        name_en: "Faculty of Agriculture & Agro-Industry",
+        name_km: "មហាវិទ្យាល័យកសិកម្ម និងកសិ-ឧស្សាហកម្ម",
+        majors: [
+          {
+            key: "agriculture",
+            name_en: "Agronomy and Agro-Industry",
+            name_km: "ក្សេត្រសាស្ត្រ និងកសិឧស្សាហកម្ម",
+            tuition_per_year_usd: 350,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋាភិបាល"],
+            related_majors: ["environmental_science"]
+          },
+          {
+            key: "civil_engineering",
+            name_en: "Rural Civil Engineering",
+            name_km: "វិស្វកម្មសំណង់ជនបទ",
+            tuition_per_year_usd: 380,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋាភិបាល"],
+            related_majors: ["mechanical_engineering"]
+          }
+        ]
+      }
+    ]
+  },
+
+  // ─────────────────────────────────────────────
+  // 4. Takeo (ខេត្តតាកែវ)
+  // ─────────────────────────────────────────────
+  {
+    id: "spi_tk",
+    name_en: "Saint Paul Institute",
+    name_km: "វិទ្យាស្ថានសន្តប៉ូល (តាកែវ)",
+    short_name: "SPI",
+    location: "National Road 2, Tram Kak District, Takeo Province",
+    province: "Takeo",
+    province_km: "ខេត្តតាកែវ",
+    website: "https://www.spi.edu.kh",
+    teaching_languages: ["Khmer", "English"],
+    ranking: 2,
+    faculties: [
+      {
+        name_en: "Faculty of Information Technology",
+        name_km: "មហាវិទ្យាល័យព័ត៌មានវិទ្យា",
+        majors: [
+          {
+            key: "computer_science",
+            name_en: "Information Technology and Software",
+            name_km: "ព័ត៌មានវិទ្យា និងកម្មវិធីកុំព្យូទ័រ",
+            tuition_per_year_usd: 450,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍អង្គការសន្តប៉ូល", "អាហារូបករណ៍និស្សិតខ្វះខាត"],
+            related_majors: ["software_engineering"]
+          },
+          {
+            key: "software_engineering",
+            name_en: "Software Application Development",
+            name_km: "វិស្វកម្មកម្មវិធីកុំព្យូទ័រ",
+            tuition_per_year_usd: 480,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍សន្តប៉ូល"],
+            related_majors: ["computer_science"]
+          }
+        ]
+      },
+      {
+        name_en: "Faculty of Agriculture & Rural Development",
+        name_km: "មហាវិទ្យាល័យកសិកម្ម និងអភិវឌ្ឍន៍ជនបទ",
+        majors: [
+          {
+            key: "agriculture",
+            name_en: "Sustainable Agriculture & Animal Science",
+            name_km: "កសិកម្មនិរន្តរភាព និងបសុវប្បកម្ម",
+            tuition_per_year_usd: 400,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ឧបត្ថម្ភការសិក្សា"],
+            related_majors: ["environmental_science"]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "bbu_tk",
+    name_en: "Build Bright University Takeo",
+    name_km: "សាកលវិទ្យាល័យបៀលប្រាយ (តាកែវ)",
+    short_name: "BBU Takeo",
+    location: "Doun Keo, Takeo Province",
+    province: "Takeo",
+    province_km: "ខេត្តតាកែវ",
+    website: "https://www.bbu.edu.kh",
+    teaching_languages: ["Khmer", "English"],
+    ranking: 3,
+    faculties: [
+      {
+        name_en: "Faculty of Business and Law",
+        name_km: "មហាវិទ្យាល័យពាណិជ្ជកម្ម និងច្បាប់",
+        majors: [
+          {
+            key: "business_administration",
+            name_en: "Business Administration",
+            name_km: "ការគ្រប់គ្រងពាណិជ្ជកម្ម",
+            tuition_per_year_usd: 420,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ BBU"],
+            related_majors: ["accounting", "marketing"]
+          },
+          {
+            key: "accounting",
+            name_en: "Accounting and Finance",
+            name_km: "គណនេយ្យ និងហិរញ្ញវត្ថុ",
+            tuition_per_year_usd: 420,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ BBU"],
+            related_majors: ["business_administration"]
+          },
+          {
+            key: "law",
+            name_en: "Law",
+            name_km: "នីតិសាស្ត្រ",
+            tuition_per_year_usd: 450,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ BBU"],
+            related_majors: ["business_administration"]
+          }
+        ]
+      }
+    ]
+  },
+
+  // ─────────────────────────────────────────────
+  // 5. Kampot (ខេត្តកំពត)
+  // ─────────────────────────────────────────────
+  {
+    id: "bbu_kp",
+    name_en: "Build Bright University Kampot",
+    name_km: "សាកលវិទ្យាល័យបៀលប្រាយ (កំពត)",
+    short_name: "BBU Kampot",
+    location: "Kampot City, Kampot Province",
+    province: "Kampot",
+    province_km: "ខេត្តកំពត",
+    website: "https://www.bbu.edu.kh",
+    teaching_languages: ["Khmer", "English"],
+    ranking: 2,
+    faculties: [
+      {
+        name_en: "Faculty of Tourism & Business",
+        name_km: "មហាវិទ្យាល័យទេសចរណ៍ និងគ្រប់គ្រង",
+        majors: [
+          {
+            key: "tourism_and_hospitality_management",
+            name_en: "Tourism and Hospitality Management",
+            name_km: "ទេសចរណ៍ និងបដិសណ្ឋារកិច្ច (កំពត)",
+            tuition_per_year_usd: 450,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ BBU"],
+            related_majors: ["business_administration", "marketing"]
+          },
+          {
+            key: "business_administration",
+            name_en: "Business Administration",
+            name_km: "ការគ្រប់គ្រងពាណិជ្ជកម្ម",
+            tuition_per_year_usd: 420,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ BBU"],
+            related_majors: ["accounting"]
+          },
+          {
+            key: "accounting",
+            name_en: "Accounting and Finance",
+            name_km: "គណនេយ្យ និងហិរញ្ញវត្ថុ",
+            tuition_per_year_usd: 420,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ BBU"],
+            related_majors: ["business_administration"]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "kpi",
+    name_en: "Kampot Regional Polytechnic Institute",
+    name_km: "វិទ្យាស្ថានពហុបច្ចេកទេសភូមិភាគតេជោសែន កំពត",
+    short_name: "KPI",
+    location: "Kampot City, Kampot Province",
+    province: "Kampot",
+    province_km: "ខេត្តកំពត",
+    website: "https://www.kpi.edu.kh",
+    teaching_languages: ["Khmer"],
+    ranking: 3,
+    faculties: [
+      {
+        name_en: "Department of Civil Engineering & Health",
+        name_km: "ដេប៉ាតឺម៉ង់សំណង់ស៊ីវិល និងគិលានុបដ្ឋាក",
+        majors: [
+          {
+            key: "civil_engineering",
+            name_en: "Civil Engineering",
+            name_km: "វិស្វកម្មសំណង់ស៊ីវិល",
+            tuition_per_year_usd: 350,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ក្រសួងការងារ ១០០%"],
+            related_majors: ["mechanical_engineering"]
+          },
+          {
+            key: "nursing",
+            name_en: "Nursing and Community Health",
+            name_km: "គិលានុបដ្ឋាក និងសុខភាពសហគមន៍",
+            tuition_per_year_usd: 500,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប (វិទ្យាសាស្ត្រ)"],
+            scholarships: ["អាហារូបករណ៍សុខាភិបាល"],
+            related_majors: ["public_health"]
+          }
+        ]
+      }
+    ]
+  },
+
+  // ─────────────────────────────────────────────
+  // 6. Kep (ខេត្តកែប)
+  // ─────────────────────────────────────────────
+  {
+    id: "ktc_kep",
+    name_en: "Kep Hospitality and Tourism Training Center",
+    name_km: "មជ្ឈមណ្ឌលបណ្តុះបណ្តាលទេសចរណ៍ និងបដិសណ្ឋារកិច្ចខេត្តកែប",
+    short_name: "KTC Kep",
+    location: "Kep City, Kep Province",
+    province: "Kep",
+    province_km: "ខេត្តកែប",
+    website: "https://www.kep-tourism.gov.kh",
+    teaching_languages: ["Khmer", "English", "French"],
+    ranking: 3,
+    faculties: [
+      {
+        name_en: "School of Coastal Tourism and Culinary Arts",
+        name_km: "សាលាទេសចរណ៍តំបន់ឆ្នេរ និងសិល្បៈធ្វើម្ហូប",
+        majors: [
+          {
+            key: "tourism_and_hospitality_management",
+            name_en: "Coastal Tourism and Resort Management",
+            name_km: "ទេសចរណ៍តំបន់ឆ្នេរ និងការគ្រប់គ្រងរមណីយដ្ឋាន",
+            tuition_per_year_usd: 380,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ក្រសួងទេសចរណ៍"],
+            related_majors: ["business_administration"]
+          },
+          {
+            key: "business_administration",
+            name_en: "Small Business & Hospitality Enterprise",
+            name_km: "ការគ្រប់គ្រងសហគ្រាសខ្នាតតូច និងបដិសណ្ឋារកិច្ច",
+            tuition_per_year_usd: 380,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋ"],
+            related_majors: ["tourism_and_hospitality_management"]
+          }
+        ]
+      }
+    ]
+  },
+
+  // ─────────────────────────────────────────────
+  // 7. Preah Sihanouk (ខេត្តព្រះសីហនុ)
+  // ─────────────────────────────────────────────
+  {
+    id: "life_u",
+    name_en: "Life University",
+    name_km: "សាកលវិទ្យាល័យឡាយហ្វ",
+    short_name: "Life U",
+    location: "Mithapheap, Preah Sihanouk City",
+    province: "Preah Sihanouk",
+    province_km: "ខេត្តព្រះសីហនុ",
+    website: "https://www.lifeun.edu.kh",
+    teaching_languages: ["Khmer", "English", "Korean"],
+    ranking: 2,
+    faculties: [
+      {
+        name_en: "Faculty of Health Sciences",
+        name_km: "មហាវិទ្យាល័យវិទ្យាសាស្ត្រសុខាភិបាល",
+        majors: [
+          {
+            key: "nursing",
+            name_en: "Nursing",
+            name_km: "គិលានុបដ្ឋាក",
+            tuition_per_year_usd: 850,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍អង្គការកូរ៉េ", "អាហារូបករណ៍ Life U"],
+            related_majors: ["public_health"]
+          },
+          {
+            key: "public_health",
+            name_en: "Public Health",
+            name_km: "សុខភាពសាធារណៈ",
+            tuition_per_year_usd: 800,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ Life U"],
+            related_majors: ["nursing"]
+          }
+        ]
+      },
+      {
+        name_en: "Faculty of Tourism & Computer Science",
+        name_km: "មហាវិទ្យាល័យទេសចរណ៍ និងព័ត៌មានវិទ្យា",
+        majors: [
+          {
+            key: "tourism_and_hospitality_management",
+            name_en: "Hospitality & Maritime Tourism",
+            name_km: "បដិសណ្ឋារកិច្ច និងទេសចរណ៍សមុទ្រ",
+            tuition_per_year_usd: 650,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ Life U"],
+            related_majors: ["business_administration"]
+          },
+          {
+            key: "computer_science",
+            name_en: "Computer Science",
+            name_km: "វិទ្យាសាស្ត្រកុំព្យូទ័រ",
+            tuition_per_year_usd: 650,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ Life U"],
+            related_majors: ["software_engineering"]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "bbu_shv",
+    name_en: "Build Bright University Sihanoukville",
+    name_km: "សាកលវិទ្យាល័យបៀលប្រាយ (ព្រះសីហនុ)",
+    short_name: "BBU SHV",
+    location: "Preah Sihanouk City, Preah Sihanouk",
+    province: "Preah Sihanouk",
+    province_km: "ខេត្តព្រះសីហនុ",
+    website: "https://www.bbu.edu.kh",
+    teaching_languages: ["Khmer", "English"],
+    ranking: 3,
+    faculties: [
+      {
+        name_en: "Faculty of Business Administration & Logistics",
+        name_km: "មហាវិទ្យាល័យគ្រប់គ្រង និងភស្តុភារកម្ម",
+        majors: [
+          {
+            key: "business_administration",
+            name_en: "Logistics and Business Administration",
+            name_km: "ភស្តុភារកម្ម និងការគ្រប់គ្រងពាណិជ្ជកម្ម",
+            tuition_per_year_usd: 500,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ BBU"],
+            related_majors: ["accounting", "marketing"]
+          },
+          {
+            key: "accounting",
+            name_en: "Accounting and Finance",
+            name_km: "គណនេយ្យ និងហិរញ្ញវត្ថុ",
+            tuition_per_year_usd: 500,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ BBU"],
+            related_majors: ["business_administration"]
+          },
+          {
+            key: "civil_engineering",
+            name_en: "Civil & Port Construction Engineering",
+            name_km: "វិស្វកម្មសំណង់ស៊ីវិល និងកំពង់ផែ",
+            tuition_per_year_usd: 550,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ BBU"],
+            related_majors: ["mechanical_engineering"]
+          }
+        ]
+      }
+    ]
+  },
+
+  // ─────────────────────────────────────────────
+  // 8. Koh Kong (ខេត្តកោះកុង)
+  // ─────────────────────────────────────────────
+  {
+    id: "kkpi",
+    name_en: "Koh Kong Polytechnic Institute",
+    name_km: "វិទ្យាស្ថានពហុបច្ចេកទេសខេត្តកោះកុង",
+    short_name: "KKPI",
+    location: "Khemarak Phoumin, Koh Kong Province",
+    province: "Koh Kong",
+    province_km: "ខេត្តកោះកុង",
+    website: "https://www.kkpi.edu.kh",
+    teaching_languages: ["Khmer"],
+    ranking: 3,
+    faculties: [
+      {
+        name_en: "Department of Tourism, Business & Agriculture",
+        name_km: "ដេប៉ាតឺម៉ង់ទេសចរណ៍ ធុរកិច្ច និងកសិកម្ម",
+        majors: [
+          {
+            key: "tourism_and_hospitality_management",
+            name_en: "Ecotourism and Coastal Hospitality",
+            name_km: "ទេសចរណ៍ធម្មជាតិ និងបដិសណ្ឋារកិច្ចឆ្នេរសមុទ្រ",
+            tuition_per_year_usd: 350,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ក្រសួងការងារ ១០០%"],
+            related_majors: ["business_administration"]
+          },
+          {
+            key: "agriculture",
+            name_en: "Coastal Agriculture & Agroforestry",
+            name_km: "កសិកម្មតំបន់ឆ្នេរ និងកសិ-រុក្ខកម្ម",
+            tuition_per_year_usd: 320,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋាភិបាល"],
+            related_majors: ["environmental_science"]
+          },
+          {
+            key: "environmental_science",
+            name_en: "Mangrove & Marine Environmental Conservation",
+            name_km: "ការអភិរក្សព្រៃកោងកាង និងបរិស្ថានសមុទ្រ",
+            tuition_per_year_usd: 350,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ក្រសួងបរិស្ថាន"],
+            related_majors: ["agriculture"]
+          }
+        ]
+      }
+    ]
+  },
+
+  // ─────────────────────────────────────────────
+  // 9. Kampong Chhnang (ខេត្តកំពង់ឆ្នាំង)
+  // ─────────────────────────────────────────────
+  {
+    id: "kcnpi",
+    name_en: "Kampong Chhnang Polytechnic Institute",
+    name_km: "វិទ្យាស្ថានពហុបច្ចេកទេសខេត្តកំពង់ឆ្នាំង",
+    short_name: "KCNPI",
+    location: "Kampong Chhnang City, Kampong Chhnang",
+    province: "Kampong Chhnang",
+    province_km: "ខេត្តកំពង់ឆ្នាំង",
+    website: "https://www.kcnpi.edu.kh",
+    teaching_languages: ["Khmer"],
+    ranking: 3,
+    faculties: [
+      {
+        name_en: "Faculty of Applied Sciences & Engineering",
+        name_km: "មហាវិទ្យាល័យវិទ្យាសាស្ត្រអនុវត្ត និងវិស្វកម្ម",
+        majors: [
+          {
+            key: "civil_engineering",
+            name_en: "Civil Construction and Irrigation Engineering",
+            name_km: "វិស្វកម្មសំណង់ស៊ីវិល និងធារាសាស្ត្រ",
+            tuition_per_year_usd: 350,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋាភិបាល ១០០%"],
+            related_majors: ["mechanical_engineering"]
+          },
+          {
+            key: "agriculture",
+            name_en: "Fisheries and Inland Agriculture",
+            name_km: "ជលផល និងកសិកម្មទឹកសាប",
+            tuition_per_year_usd: 320,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋ"],
+            related_majors: ["environmental_science"]
+          },
+          {
+            key: "computer_science",
+            name_en: "Information Systems and IT",
+            name_km: "ប្រព័ន្ធព័ត៌មាន និងបច្ចេកវិទ្យាកុំព្យូទ័រ",
+            tuition_per_year_usd: 350,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋ"],
+            related_majors: ["software_engineering"]
+          }
+        ]
+      }
+    ]
+  },
+
+  // ─────────────────────────────────────────────
+  // 10. Pursat (ខេត្តពោធិ៍សាត់)
+  // ─────────────────────────────────────────────
+  {
+    id: "ppi_ps",
+    name_en: "Pursat Polytechnic Institute",
+    name_km: "វិទ្យាស្ថានពហុបច្ចេកទេសខេត្តពោធិ៍សាត់",
+    short_name: "PPI Pursat",
+    location: "Pursat City, Pursat Province",
+    province: "Pursat",
+    province_km: "ខេត្តពោធិ៍សាត់",
+    website: "https://www.ppips.edu.kh",
+    teaching_languages: ["Khmer"],
+    ranking: 3,
+    faculties: [
+      {
+        name_en: "Department of Engineering & Agriculture",
+        name_km: "ដេប៉ាតឺម៉ង់វិស្វកម្ម និងកសិកម្ម",
+        majors: [
+          {
+            key: "mechanical_engineering",
+            name_en: "Mechanical & Agricultural Machinery",
+            name_km: "វិស្វកម្មមេកានិច និងគ្រឿងយន្តកសិកម្ម",
+            tuition_per_year_usd: 350,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ក្រសួងការងារ ១០០%"],
+            related_majors: ["civil_engineering"]
+          },
+          {
+            key: "agriculture",
+            name_en: "Agronomy and Crop Production",
+            name_km: "ក្សេត្រសាស្ត្រ និងផលិតកម្មដំណាំ",
+            tuition_per_year_usd: 320,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋ"],
+            related_majors: ["environmental_science"]
+          },
+          {
+            key: "environmental_science",
+            name_en: "Water Resources & Environmental Management",
+            name_km: "ការគ្រប់គ្រងធនធានទឹក និងបរិស្ថាន",
+            tuition_per_year_usd: 350,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ក្រសួងបរិស្ថាន"],
+            related_majors: ["agriculture"]
+          }
+        ]
+      }
+    ]
+  },
+
+  // ─────────────────────────────────────────────
+  // 11. Battambang (ខេត្តបាត់ដំបង)
+  // ─────────────────────────────────────────────
+  {
+    id: "nubb",
+    name_en: "National University of Battambang",
+    name_km: "សាកលវិទ្យាល័យជាតិនៃបាត់ដំបង",
+    short_name: "NUBB",
+    location: "National Road 5, Battambang City",
+    province: "Battambang",
+    province_km: "ខេត្តបាត់ដំបង",
+    website: "https://www.nubb.edu.kh",
+    teaching_languages: ["Khmer", "English", "French"],
+    ranking: 1,
+    faculties: [
+      {
+        name_en: "Faculty of Agriculture and Food Processing",
+        name_km: "មហាវិទ្យាល័យកសិកម្ម និងកែច្នៃអាហារ",
+        majors: [
+          {
+            key: "agriculture",
+            name_en: "Agronomy and Smart Farming",
+            name_km: "ក្សេត្រសាស្ត្រ និងកសិកម្មឆ្លាតវៃ (ជង្រុកស្រូវកម្ពុជា)",
+            tuition_per_year_usd: 400,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋាភិបាល ១០០%", "អាហារូបករណ៍កសិកម្ម Erasmus+"],
+            related_majors: ["environmental_science"]
+          },
+          {
+            key: "environmental_science",
+            name_en: "Agro-Environmental Sciences",
+            name_km: "វិទ្យាសាស្ត្របរិស្ថានកសិកម្ម",
+            tuition_per_year_usd: 400,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋាភិបាល"],
+            related_majors: ["agriculture"]
+          }
+        ]
+      },
+      {
+        name_en: "Faculty of Science and Technology",
+        name_km: "មហាវិទ្យាល័យវិទ្យាសាស្ត្រ និងបច្ចេកវិទ្យា",
+        majors: [
+          {
+            key: "computer_science",
+            name_en: "Computer Science and IT",
+            name_km: "វិទ្យាសាស្ត្រកុំព្យូទ័រ និងព័ត៌មានវិទ្យា",
+            tuition_per_year_usd: 450,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋាភិបាល"],
+            related_majors: ["software_engineering"]
+          },
+          {
+            key: "civil_engineering",
+            name_en: "Civil Engineering",
+            name_km: "វិស្វកម្មសំណង់ស៊ីវិល",
+            tuition_per_year_usd: 480,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋ"],
+            related_majors: ["mechanical_engineering"]
+          }
+        ]
+      },
+      {
+        name_en: "Faculty of Business Administration and Law",
+        name_km: "មហាវិទ្យាល័យគ្រប់គ្រងពាណិជ្ជកម្ម និងនីតិសាស្ត្រ",
+        majors: [
+          {
+            key: "business_administration",
+            name_en: "Business Administration",
+            name_km: "ការគ្រប់គ្រងពាណិជ្ជកម្ម",
+            tuition_per_year_usd: 420,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋ"],
+            related_majors: ["accounting", "marketing"]
+          },
+          {
+            key: "accounting",
+            name_en: "Accounting and Finance",
+            name_km: "គណនេយ្យ និងហិរញ្ញវត្ថុ",
+            tuition_per_year_usd: 420,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋ"],
+            related_majors: ["business_administration"]
+          },
+          {
+            key: "law",
+            name_en: "Law",
+            name_km: "នីតិសាស្ត្រ (បាត់ដំបង)",
+            tuition_per_year_usd: 450,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋ"],
+            related_majors: ["business_administration"]
+          },
+          {
+            key: "education",
+            name_en: "Educational Sciences",
+            name_km: "វិទ្យាសាស្ត្រអប់រំ (បាត់ដំបង)",
+            tuition_per_year_usd: 400,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ក្រសួងអប់រំ"],
+            related_majors: ["psychology"]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "vanda_btb",
+    name_en: "Vanda Institute Battambang",
+    name_km: "វិទ្យាស្ថានវ៉ាន់ដា (សាខាបាត់ដំបង)",
+    short_name: "Vanda BTB",
+    location: "Battambang City, Battambang Province",
+    province: "Battambang",
+    province_km: "ខេត្តបាត់ដំបង",
+    website: "https://www.vanda.edu.kh",
+    teaching_languages: ["Khmer", "English"],
+    ranking: 1,
+    faculties: [
+      {
+        name_en: "Department of Accounting & Management",
+        name_km: "ដេប៉ាតឺម៉ង់គណនេយ្យ និងគ្រប់គ្រង",
+        majors: [
+          {
+            key: "accounting",
+            name_en: "Accounting and Auditing",
+            name_km: "គណនេយ្យ និងសវនកម្ម (បាត់ដំបង)",
+            tuition_per_year_usd: 550,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍វ៉ាន់ដា"],
+            related_majors: ["business_administration"]
+          },
+          {
+            key: "business_administration",
+            name_en: "Business Administration",
+            name_km: "ការគ្រប់គ្រងពាណិជ្ជកម្ម",
+            tuition_per_year_usd: 520,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍វ៉ាន់ដា"],
+            related_majors: ["accounting", "marketing"]
+          },
+          {
+            key: "marketing",
+            name_en: "Marketing",
+            name_km: "ទីផ្សារ",
+            tuition_per_year_usd: 520,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍វ៉ាន់ដា"],
+            related_majors: ["business_administration"]
+          }
+        ]
+      }
+    ]
+  },
+
+  // ─────────────────────────────────────────────
+  // 12. Pailin (ខេត្តប៉ៃលិន)
+  // ─────────────────────────────────────────────
+  {
+    id: "ppi_pl",
+    name_en: "Pailin Regional Polytechnic Institute",
+    name_km: "វិទ្យាស្ថានពហុបច្ចេកទេសខេត្តប៉ៃលិន",
+    short_name: "PPI Pailin",
+    location: "Pailin City, Pailin Province",
+    province: "Pailin",
+    province_km: "ខេត្តប៉ៃលិន",
+    website: "https://www.ppipl.edu.kh",
+    teaching_languages: ["Khmer"],
+    ranking: 3,
+    faculties: [
+      {
+        name_en: "Department of Technical and Agricultural Skills",
+        name_km: "ដេប៉ាតឺម៉ង់បច្ចេកទេស និងកសិកម្ម",
+        majors: [
+          {
+            key: "agriculture",
+            name_en: "Horticulture and Fruit Tree Farming (Longan/Durian)",
+            name_km: "ក្សេត្រសាស្ត្រ និងដំណាំសាកវប្បកម្ម (មៀនប៉ៃលិន/ធុរេន)",
+            tuition_per_year_usd: 320,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋាភិបាល ១០០%"],
+            related_majors: ["environmental_science"]
+          },
+          {
+            key: "business_administration",
+            name_en: "Cross-border Trade and Enterprise",
+            name_km: "ពាណិជ្ជកម្មព្រំដែន និងការគ្រប់គ្រងសហគ្រាស",
+            tuition_per_year_usd: 350,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋ"],
+            related_majors: ["accounting"]
+          },
+          {
+            key: "tourism_and_hospitality_management",
+            name_en: "Ecotourism and Border Hospitality",
+            name_km: "ទេសចរណ៍ធម្មជាតិ និងបដិសណ្ឋារកិច្ចតំបន់ព្រំដែន",
+            tuition_per_year_usd: 350,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋ"],
+            related_majors: ["business_administration"]
+          }
+        ]
+      }
+    ]
+  },
+
+  // ─────────────────────────────────────────────
+  // 13. Banteay Meanchey (ខេត្តបន្ទាយមានជ័យ)
+  // ─────────────────────────────────────────────
+  {
+    id: "mcu",
+    name_en: "Meanchey University",
+    name_km: "សាកលវិទ្យាល័យមានជ័យ",
+    short_name: "MCU",
+    location: "Serei Saophoan, Banteay Meanchey",
+    province: "Banteay Meanchey",
+    province_km: "ខេត្តបន្ទាយមានជ័យ",
+    website: "https://www.mcu.edu.kh",
+    teaching_languages: ["Khmer", "English"],
+    ranking: 2,
+    faculties: [
+      {
+        name_en: "Faculty of Agriculture and Environment",
+        name_km: "មហាវិទ្យាល័យកសិកម្ម និងបរិស្ថាន",
+        majors: [
+          {
+            key: "agriculture",
+            name_en: "Agronomy and Agro-Forestry",
+            name_km: "ក្សេត្រសាស្ត្រ និងកសិ-រុក្ខកម្ម",
+            tuition_per_year_usd: 380,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋាភិបាល ១០០%"],
+            related_majors: ["environmental_science"]
+          },
+          {
+            key: "environmental_science",
+            name_en: "Environmental Science and Resource Management",
+            name_km: "វិទ្យាសាស្ត្របរិស្ថាន និងការគ្រប់គ្រងធនធាន",
+            tuition_per_year_usd: 380,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋ"],
+            related_majors: ["agriculture"]
+          }
+        ]
+      },
+      {
+        name_en: "Faculty of Business Administration and Tourism",
+        name_km: "មហាវិទ្យាល័យគ្រប់គ្រងពាណិជ្ជកម្ម និងទេសចរណ៍",
+        majors: [
+          {
+            key: "business_administration",
+            name_en: "International Border Trade & Management",
+            name_km: "ការគ្រប់គ្រងពាណិជ្ជកម្ម និងពាណិជ្ជកម្មអន្តរជាតិ",
+            tuition_per_year_usd: 400,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋ"],
+            related_majors: ["accounting", "marketing"]
+          },
+          {
+            key: "computer_science",
+            name_en: "Computer Science",
+            name_km: "វិទ្យាសាស្ត្រកុំព្យូទ័រ",
+            tuition_per_year_usd: 420,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋ"],
+            related_majors: ["software_engineering"]
+          },
+          {
+            key: "tourism_and_hospitality_management",
+            name_en: "Tourism & Hospitality Management",
+            name_km: "ទេសចរណ៍ និងបដិសណ្ឋារកិច្ច",
+            tuition_per_year_usd: 400,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋ"],
+            related_majors: ["business_administration"]
+          }
+        ]
+      }
+    ]
+  },
+
+  // ─────────────────────────────────────────────
+  // 14. Siem Reap (ខេត្តសៀមរាប)
+  // ─────────────────────────────────────────────
+  {
+    id: "usea",
+    name_en: "University of South-East Asia",
+    name_km: "សាកលវិទ្យាល័យអាស៊ីអាគ្នេយ៍",
+    short_name: "USEA",
+    location: "Wat Bo Road, Siem Reap City",
+    province: "Siem Reap",
+    province_km: "ខេត្តសៀមរាប",
+    website: "https://www.usea.edu.kh",
+    teaching_languages: ["Khmer", "English"],
+    ranking: 1,
+    faculties: [
+      {
+        name_en: "Faculty of Tourism and Hospitality",
+        name_km: "មហាវិទ្យាល័យទេសចរណ៍ និងបដិសណ្ឋារកិច្ច",
+        majors: [
+          {
+            key: "tourism_and_hospitality_management",
+            name_en: "International Tourism and Hotel Management",
+            name_km: "ទេសចរណ៍អន្តរជាតិ និងការគ្រប់គ្រងសណ្ឋាគារ (លំដាប់ #2 សៀមរាប)",
+            tuition_per_year_usd: 550,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប", "តេស្តភាសាអង់គ្លេស"],
+            scholarships: ["អាហារូបករណ៍សាកលវិទ្យាល័យ", "អាហារូបករណ៍សណ្ឋាគារដៃគូ"],
+            related_majors: ["business_administration", "marketing"]
+          }
+        ]
+      },
+      {
+        name_en: "Faculty of Science and Information Technology",
+        name_km: "មហាវិទ្យាល័យវិទ្យាសាស្ត្រ និងបច្ចេកវិទ្យាព័ត៌មាន",
+        majors: [
+          {
+            key: "computer_science",
+            name_en: "Computer Science",
+            name_km: "វិទ្យាសាស្ត្រកុំព្យូទ័រ (សៀមរាប)",
+            tuition_per_year_usd: 520,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ USEA"],
+            related_majors: ["software_engineering"]
+          },
+          {
+            key: "software_engineering",
+            name_en: "Software Development",
+            name_km: "ការអភិវឌ្ឍកម្មវិធីកុំព្យូទ័រ",
+            tuition_per_year_usd: 550,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ USEA"],
+            related_majors: ["computer_science"]
+          }
+        ]
+      },
+      {
+        name_en: "Faculty of Business Administration and Humanities",
+        name_km: "មហាវិទ្យាល័យគ្រប់គ្រងពាណិជ្ជកម្ម និងមនុស្សសាស្ត្រ",
+        majors: [
+          {
+            key: "business_administration",
+            name_en: "Business Administration",
+            name_km: "ការគ្រប់គ្រងពាណិជ្ជកម្ម",
+            tuition_per_year_usd: 500,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ USEA"],
+            related_majors: ["accounting", "marketing"]
+          },
+          {
+            key: "marketing",
+            name_en: "Marketing",
+            name_km: "ទីផ្សារ",
+            tuition_per_year_usd: 500,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ USEA"],
+            related_majors: ["business_administration"]
+          },
+          {
+            key: "education",
+            name_en: "Teaching English as a Foreign Language (TEFL)",
+            name_km: "ការបង្រៀនភាសាអង់គ្លេស និងគរុកោសល្យ",
+            tuition_per_year_usd: 480,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ USEA"],
+            related_majors: ["psychology"]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "paul_dubrule",
+    name_en: "École d'Hôtellerie et de Tourisme Paul Dubrule",
+    name_km: "សាលាបដិសណ្ឋារកិច្ច និងទេសចរណ៍ ប៉ូល ឌុយប្រ៊ូល",
+    short_name: "Paul Dubrule",
+    location: "National Road 6, Banteay Chas, Siem Reap City",
+    province: "Siem Reap",
+    province_km: "ខេត្តសៀមរាប",
+    website: "https://www.pauldubrule.edu.kh",
+    teaching_languages: ["English", "French", "Khmer"],
+    ranking: 1,
+    faculties: [
+      {
+        name_en: "School of Hospitality & Tourism",
+        name_km: "សាលាបដិសណ្ឋារកិច្ច និងទេសចរណ៍ (ស្តង់ដារអន្តរជាតិបារាំង)",
+        majors: [
+          {
+            key: "tourism_and_hospitality_management",
+            name_en: "Hospitality and Tourism Operations Management",
+            name_km: "ការគ្រប់គ្រងប្រតិបត្តិការបដិសណ្ឋារកិច្ច និងទេសចរណ៍ (លំដាប់ #1 កម្ពុជា)",
+            tuition_per_year_usd: 1200,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប ឬប្រឡងចូល", "សម្ភាសន៍ និងតេស្តភាសាអង់គ្លេស"],
+            scholarships: ["អាហារូបករណ៍មូលនិធិ Paul Dubrule រហូតដល់ ១០០%"],
+            related_majors: ["business_administration"]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "angkor_u",
+    name_en: "Angkor University",
+    name_km: "សាកលវិទ្យាល័យអង្គរ",
+    short_name: "Angkor U",
+    location: "National Road 6, Phum Banteay Chas, Siem Reap",
+    province: "Siem Reap",
+    province_km: "ខេត្តសៀមរាប",
+    website: "https://www.angkor.edu.kh",
+    teaching_languages: ["Khmer", "English"],
+    ranking: 2,
+    faculties: [
+      {
+        name_en: "Faculty of Public Health and Nursing",
+        name_km: "មហាវិទ្យាល័យសុខភាពសាធារណៈ និងគិលានុបដ្ឋាក",
+        majors: [
+          {
+            key: "nursing",
+            name_en: "Nursing",
+            name_km: "គិលានុបដ្ឋាក (សៀមរាប)",
+            tuition_per_year_usd: 800,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប (វិទ្យាសាស្ត្រ)"],
+            scholarships: ["អាហារូបករណ៍សាកលវិទ្យាល័យ"],
+            related_majors: ["public_health"]
+          },
+          {
+            key: "public_health",
+            name_en: "Public Health",
+            name_km: "សុខភាពសាធារណៈ",
+            tuition_per_year_usd: 750,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍សាកលវិទ្យាល័យ"],
+            related_majors: ["nursing"]
+          }
+        ]
+      },
+      {
+        name_en: "Faculty of Civil Engineering and Architecture",
+        name_km: "មហាវិទ្យាល័យវិស្វកម្ម និងស្ថាបត្យកម្ម",
+        majors: [
+          {
+            key: "civil_engineering",
+            name_en: "Civil Engineering",
+            name_km: "វិស្វកម្មសំណង់ស៊ីវិល",
+            tuition_per_year_usd: 600,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍អង្គរ"],
+            related_majors: ["architecture"]
+          },
+          {
+            key: "architecture",
+            name_en: "Architecture & Heritage Conservation",
+            name_km: "ស្ថាបត្យកម្ម និងការអភិរក្សបេតិកភណ្ឌ",
+            tuition_per_year_usd: 650,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប", "តេស្តគំនូរ"],
+            scholarships: ["អាហារូបករណ៍លើកទឹកចិត្ត"],
+            related_majors: ["civil_engineering"]
+          }
+        ]
+      }
+    ]
+  },
+
+  // ─────────────────────────────────────────────
+  // 15. Oddar Meanchey (ខេត្តឧត្តរមានជ័យ)
+  // ─────────────────────────────────────────────
+  {
+    id: "ompi",
+    name_en: "Oddar Meanchey Polytechnic Institute",
+    name_km: "វិទ្យាស្ថានពហុបច្ចេកទេសខេត្តឧត្តរមានជ័យ",
+    short_name: "OMPI",
+    location: "Samraong City, Oddar Meanchey",
+    province: "Oddar Meanchey",
+    province_km: "ខេត្តឧត្តរមានជ័យ",
+    website: "https://www.ompi.edu.kh",
+    teaching_languages: ["Khmer"],
+    ranking: 3,
+    faculties: [
+      {
+        name_en: "Department of Agriculture and Technical Training",
+        name_km: "ដេប៉ាតឺម៉ង់កសិកម្ម និងបណ្តុះបណ្តាលបច្ចេកទេស",
+        majors: [
+          {
+            key: "agriculture",
+            name_en: "Agronomy and Cassava / Rubber Farming",
+            name_km: "ក្សេត្រសាស្ត្រ និងដំណាំកសិ-ឧស្សាហកម្ម (ដំឡូងមី/កៅស៊ូ)",
+            tuition_per_year_usd: 320,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋាភិបាល ១០០%"],
+            related_majors: ["environmental_science"]
+          },
+          {
+            key: "civil_engineering",
+            name_en: "Rural Construction & Mechanics",
+            name_km: "សំណង់ស៊ីវិលជនបទ និងមេកានិច",
+            tuition_per_year_usd: 350,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ក្រសួងការងារ"],
+            related_majors: ["mechanical_engineering"]
+          },
+          {
+            key: "business_administration",
+            name_en: "Local Business Management",
+            name_km: "ការគ្រប់គ្រងអាជីវកម្មមូលដ្ឋាន",
+            tuition_per_year_usd: 350,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋ"],
+            related_majors: ["accounting"]
+          }
+        ]
+      }
+    ]
+  },
+
+  // ─────────────────────────────────────────────
+  // 16. Preah Vihear (ខេត្តព្រះវិហារ)
+  // ─────────────────────────────────────────────
+  {
+    id: "pvit",
+    name_en: "Samdech Techo Sen Preah Vihear Institute of Technology",
+    name_km: "វិទ្យាស្ថានបច្ចេកវិទ្យាព្រះវិហារ (សម្តេចតេជោ)",
+    short_name: "PVIT",
+    location: "Tbeng Meanchey, Preah Vihear Province",
+    province: "Preah Vihear",
+    province_km: "ខេត្តព្រះវិហារ",
+    website: "https://www.pvit.edu.kh",
+    teaching_languages: ["Khmer"],
+    ranking: 3,
+    faculties: [
+      {
+        name_en: "Faculty of Agriculture and Eco-Tourism",
+        name_km: "មហាវិទ្យាល័យកសិកម្ម និងទេសចរណ៍វប្បធម៌",
+        majors: [
+          {
+            key: "agriculture",
+            name_en: "Organic Agriculture & Agroforestry",
+            name_km: "កសិកម្មសរីរាង្គ និងកសិ-រុក្ខកម្ម",
+            tuition_per_year_usd: 320,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍សម្តេចតេជោ ១០០%"],
+            related_majors: ["environmental_science"]
+          },
+          {
+            key: "tourism_and_hospitality_management",
+            name_en: "Cultural Heritage Tourism Management",
+            name_km: "ការគ្រប់គ្រងទេសចរណ៍បេតិកភណ្ឌវប្បធម៌ (ប្រាសាទព្រះវិហារ)",
+            tuition_per_year_usd: 350,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍សម្តេចតេជោ"],
+            related_majors: ["business_administration"]
+          },
+          {
+            key: "environmental_science",
+            name_en: "Forestry and Nature Conservation",
+            name_km: "រុក្ខាប្រមាញ់ និងការអភិរក្សធម្មជាតិ",
+            tuition_per_year_usd: 340,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ក្រសួងបរិស្ថាន"],
+            related_majors: ["agriculture"]
+          }
+        ]
+      }
+    ]
+  },
+
+  // ─────────────────────────────────────────────
+  // 17. Kampong Thom (ខេត្តកំពង់ធំ)
+  // ─────────────────────────────────────────────
+  {
+    id: "ktit",
+    name_en: "Kampong Thom Institute of Technology",
+    name_km: "វិទ្យាស្ថានបច្ចេកវិទ្យាកំពង់ធំ",
+    short_name: "KTIT",
+    location: "Stung Saen City, Kampong Thom Province",
+    province: "Kampong Thom",
+    province_km: "ខេត្តកំពង់ធំ",
+    website: "https://www.ktit.edu.kh",
+    teaching_languages: ["Khmer"],
+    ranking: 3,
+    faculties: [
+      {
+        name_en: "Faculty of Engineering & Agriculture",
+        name_km: "មហាវិទ្យាល័យវិស្វកម្ម និងកសិកម្ម",
+        majors: [
+          {
+            key: "mechanical_engineering",
+            name_en: "Agricultural Mechanics and Machinery",
+            name_km: "មេកានិចកសិកម្ម និងគ្រឿងយន្តឧស្សាហកម្ម",
+            tuition_per_year_usd: 350,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋាភិបាល ១០០%"],
+            related_majors: ["civil_engineering"]
+          },
+          {
+            key: "agriculture",
+            name_en: "Cashew and Rice Agronomy",
+            name_km: "ក្សេត្រសាស្ត្រដំណាំស្វាយចន្ទី និងស្រូវ",
+            tuition_per_year_usd: 320,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋ"],
+            related_majors: ["environmental_science"]
+          },
+          {
+            key: "civil_engineering",
+            name_en: "Civil & Irrigation Engineering",
+            name_km: "វិស្វកម្មសំណង់ស៊ីវិល និងប្រព័ន្ធធារាសាស្ត្រ",
+            tuition_per_year_usd: 360,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋ"],
+            related_majors: ["mechanical_engineering"]
+          }
+        ]
+      }
+    ]
+  },
+
+  // ─────────────────────────────────────────────
+  // 18. Kampong Cham (ខេត្តកំពង់ចាម)
+  // ─────────────────────────────────────────────
+  {
+    id: "wu_kc",
+    name_en: "Western University Kampong Cham",
+    name_km: "សាកលវិទ្យាល័យវេសធើន (កំពង់ចាម)",
+    short_name: "WU KC",
+    location: "Kampong Cham City, Kampong Cham Province",
+    province: "Kampong Cham",
+    province_km: "ខេត្តកំពង់ចាម",
+    website: "https://www.western.edu.kh",
+    teaching_languages: ["Khmer", "English"],
+    ranking: 2,
+    faculties: [
+      {
+        name_en: "Faculty of Business and Information Technology",
+        name_km: "មហាវិទ្យាល័យគ្រប់គ្រងពាណិជ្ជកម្ម និងព័ត៌មានវិទ្យា",
+        majors: [
+          {
+            key: "business_administration",
+            name_en: "Business Administration",
+            name_km: "ការគ្រប់គ្រងពាណិជ្ជកម្ម",
+            tuition_per_year_usd: 450,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍វេសធើន"],
+            related_majors: ["accounting", "marketing"]
+          },
+          {
+            key: "accounting",
+            name_en: "Accounting and Finance",
+            name_km: "គណនេយ្យ និងហិរញ្ញវត្ថុ",
+            tuition_per_year_usd: 450,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍វេសធើន"],
+            related_majors: ["business_administration"]
+          },
+          {
+            key: "computer_science",
+            name_en: "Computer Science",
+            name_km: "វិទ្យាសាស្ត្រកុំព្យូទ័រ",
+            tuition_per_year_usd: 480,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍វេសធើន"],
+            related_majors: ["software_engineering"]
+          },
+          {
+            key: "law",
+            name_en: "Law",
+            name_km: "នីតិសាស្ត្រ",
+            tuition_per_year_usd: 460,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍វេសធើន"],
+            related_majors: ["business_administration"]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "rttc_kc",
+    name_en: "Regional Teacher Training Center Kampong Cham",
+    name_km: "មជ្ឈមណ្ឌលគរុកោសល្យភូមិភាគ កំពង់ចាម",
+    short_name: "RTTC KC",
+    location: "Kampong Cham City, Kampong Cham",
+    province: "Kampong Cham",
+    province_km: "ខេត្តកំពង់ចាម",
+    website: "https://www.moeys.gov.kh",
+    teaching_languages: ["Khmer"],
+    ranking: 2,
+    faculties: [
+      {
+        name_en: "Department of Pedagogy & Education",
+        name_km: "ដេប៉ាតឺម៉ង់គរុកោសល្យ និងវិធីសាស្ត្របង្រៀន",
+        majors: [
+          {
+            key: "education",
+            name_en: "Education and Secondary School Pedagogy",
+            name_km: "គរុកោសល្យ និងវិធីសាស្ត្របង្រៀនអនុវិទ្យាល័យ (លំដាប់ #2 ភូមិភាគ)",
+            tuition_per_year_usd: 0,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប", "ប្រឡងចូលក្របខណ្ឌគ្រូបង្រៀនរដ្ឋ"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋាភិបាល ១០០% (មានប្រាក់បៀវត្សរៀន)"],
+            related_majors: ["psychology"]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "pna_kc",
+    name_en: "Kampong Cham National Institute of Agriculture",
+    name_km: "វិទ្យាស្ថានជាតិកសិកម្មកំពង់ចាម",
+    short_name: "PNA KC",
+    location: "Kampong Siem, Kampong Cham Province",
+    province: "Kampong Cham",
+    province_km: "ខេត្តកំពង់ចាម",
+    website: "https://www.pna.edu.kh",
+    teaching_languages: ["Khmer"],
+    ranking: 2,
+    faculties: [
+      {
+        name_en: "Faculty of Crop Production & Animal Husbandry",
+        name_km: "មហាវិទ្យាល័យផលិតកម្មដំណាំ និងបសុព្យាបាល",
+        majors: [
+          {
+            key: "agriculture",
+            name_en: "Agronomy and Rubber Agro-Industry",
+            name_km: "ក្សេត្រសាស្ត្រ និងឧស្សាហកម្មកៅស៊ូ/ដំណាំសាកវប្បកម្ម (លំដាប់ #3)",
+            tuition_per_year_usd: 350,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋាភិបាល ១០០%"],
+            related_majors: ["environmental_science"]
+          },
+          {
+            key: "environmental_science",
+            name_en: "Mekong River Environmental Studies",
+            name_km: "ការសិក្សាបរិស្ថានទន្លេមេគង្គ និងកសិកម្ម",
+            tuition_per_year_usd: 350,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋ"],
+            related_majors: ["agriculture"]
+          }
+        ]
+      }
+    ]
+  },
+
+  // ─────────────────────────────────────────────
+  // 19. Tboung Khmum (ខេត្តត្បូងឃ្មុំ)
+  // ─────────────────────────────────────────────
+  {
+    id: "uhst",
+    name_en: "Heng Samrin Tboung Khmum University",
+    name_km: "សាកលវិទ្យាល័យហេង សំរិន ត្បូងឃ្មុំ",
+    short_name: "UHST",
+    location: "Suong City, Tboung Khmum Province",
+    province: "Tboung Khmum",
+    province_km: "ខេត្តត្បូងឃ្មុំ",
+    website: "https://www.uhst.edu.kh",
+    teaching_languages: ["Khmer", "English"],
+    ranking: 2,
+    faculties: [
+      {
+        name_en: "Faculty of Agriculture and Agro-Industry",
+        name_km: "មហាវិទ្យាល័យកសិកម្ម និងកសិ-ឧស្សាហកម្ម",
+        majors: [
+          {
+            key: "agriculture",
+            name_en: "Agronomy and Cash Crops",
+            name_km: "ក្សេត្រសាស្ត្រ និងដំណាំសេដ្ឋកិច្ច (កៅស៊ូ ស្វាយចន្ទី ម្រេច)",
+            tuition_per_year_usd: 360,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋាភិបាល ១០០%"],
+            related_majors: ["environmental_science"]
+          },
+          {
+            key: "environmental_science",
+            name_en: "Environmental Science",
+            name_km: "វិទ្យាសាស្ត្របរិស្ថាន",
+            tuition_per_year_usd: 360,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋ"],
+            related_majors: ["agriculture"]
+          }
+        ]
+      },
+      {
+        name_en: "Faculty of Science and Business Administration",
+        name_km: "មហាវិទ្យាល័យវិទ្យាសាស្ត្រ និងគ្រប់គ្រងពាណិជ្ជកម្ម",
+        majors: [
+          {
+            key: "computer_science",
+            name_en: "Computer Science",
+            name_km: "វិទ្យាសាស្ត្រកុំព្យូទ័រ",
+            tuition_per_year_usd: 380,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ UHST"],
+            related_majors: ["software_engineering"]
+          },
+          {
+            key: "business_administration",
+            name_en: "Business Administration",
+            name_km: "ការគ្រប់គ្រងពាណិជ្ជកម្ម",
+            tuition_per_year_usd: 360,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ UHST"],
+            related_majors: ["accounting", "marketing"]
+          },
+          {
+            key: "accounting",
+            name_en: "Accounting and Finance",
+            name_km: "គណនេយ្យ និងហិរញ្ញវត្ថុ",
+            tuition_per_year_usd: 360,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ UHST"],
+            related_majors: ["business_administration"]
+          }
+        ]
+      }
+    ]
+  },
+
+  // ─────────────────────────────────────────────
+  // 20. Kratie (ខេត្តក្រចេះ)
+  // ─────────────────────────────────────────────
+  {
+    id: "uok",
+    name_en: "University of Kratie",
+    name_km: "សាកលវិទ្យាល័យក្រចេះ",
+    short_name: "UOK",
+    location: "Kratie City, Kratie Province",
+    province: "Kratie",
+    province_km: "ខេត្តក្រចេះ",
+    website: "https://www.uok.edu.kh",
+    teaching_languages: ["Khmer", "English"],
+    ranking: 2,
+    faculties: [
+      {
+        name_en: "Faculty of Agriculture and Environmental Studies",
+        name_km: "មហាវិទ្យាល័យកសិកម្ម និងបរិស្ថាន",
+        majors: [
+          {
+            key: "agriculture",
+            name_en: "Agronomy and Agro-Forestry",
+            name_km: "ក្សេត្រសាស្ត្រ និងកសិ-រុក្ខកម្ម",
+            tuition_per_year_usd: 350,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋាភិបាល ១០០%"],
+            related_majors: ["environmental_science"]
+          },
+          {
+            key: "environmental_science",
+            name_en: "Mekong River Ecology & Dolphin Conservation",
+            name_km: "បរិស្ថានវិទ្យាទន្លេមេគង្គ និងការអភិរក្សសត្វផ្សោត",
+            tuition_per_year_usd: 350,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋាភិបាល", "អាហារូបករណ៍ WWF"],
+            related_majors: ["agriculture"]
+          },
+          {
+            key: "tourism_and_hospitality_management",
+            name_en: "Community-Based Eco-Tourism",
+            name_km: "ទេសចរណ៍ធម្មជាតិផ្អែកលើសហគមន៍",
+            tuition_per_year_usd: 360,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ UOK"],
+            related_majors: ["business_administration"]
+          }
+        ]
+      }
+    ]
+  },
+
+  // ─────────────────────────────────────────────
+  // 21. Stung Treng (ខេត្តស្ទឹងត្រែង)
+  // ─────────────────────────────────────────────
+  {
+    id: "stpi",
+    name_en: "Stung Treng Regional Polytechnic Institute",
+    name_km: "វិទ្យាស្ថានពហុបច្ចេកទេសភូមិភាគស្ទឹងត្រែង",
+    short_name: "STPI",
+    location: "Stung Treng City, Stung Treng",
+    province: "Stung Treng",
+    province_km: "ខេត្តស្ទឹងត្រែង",
+    website: "https://www.stpi.edu.kh",
+    teaching_languages: ["Khmer"],
+    ranking: 3,
+    faculties: [
+      {
+        name_en: "Department of Agriculture, Forestry & Engineering",
+        name_km: "ដេប៉ាតឺម៉ង់កសិកម្ម រុក្ខាប្រមាញ់ និងវិស្វកម្ម",
+        majors: [
+          {
+            key: "agriculture",
+            name_en: "Upland Agriculture & Agroforestry",
+            name_km: "កសិកម្មតំបន់ខ្ពង់រាប និងកសិ-រុក្ខកម្ម",
+            tuition_per_year_usd: 320,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋាភិបាល ១០០%"],
+            related_majors: ["environmental_science"]
+          },
+          {
+            key: "environmental_science",
+            name_en: "Watershed Management & Forestry",
+            name_km: "ការគ្រប់គ្រងអាងទន្លេ និងធនធានព្រៃឈើ",
+            tuition_per_year_usd: 320,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ក្រសួងបរិស្ថាន"],
+            related_majors: ["agriculture"]
+          },
+          {
+            key: "civil_engineering",
+            name_en: "Hydropower & Rural Civil Works",
+            name_km: "សំណង់ស៊ីវិលជនបទ និងវារីអគ្គិសនី",
+            tuition_per_year_usd: 350,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ក្រសួងការងារ"],
+            related_majors: ["mechanical_engineering"]
+          }
+        ]
+      }
+    ]
+  },
+
+  // ─────────────────────────────────────────────
+  // 22. Ratanakiri (ខេត្តរតនគិរី)
+  // ─────────────────────────────────────────────
+  {
+    id: "rpi",
+    name_en: "Ratanakiri Polytechnic Institute",
+    name_km: "វិទ្យាស្ថានពហុបច្ចេកទេសខេត្តរតនគិរី",
+    short_name: "RPI",
+    location: "Banlung City, Ratanakiri Province",
+    province: "Ratanakiri",
+    province_km: "ខេត្តរតនគិរី",
+    website: "https://www.rpi.edu.kh",
+    teaching_languages: ["Khmer"],
+    ranking: 3,
+    faculties: [
+      {
+        name_en: "Department of Agro-Forestry & Indigenous Community Studies",
+        name_km: "ដេប៉ាតឺម៉ង់កសិ-រុក្ខកម្ម និងការអភិវឌ្ឍសហគមន៍",
+        majors: [
+          {
+            key: "agriculture",
+            name_en: "Industrial Crops (Rubber, Cashew, Coffee)",
+            name_km: "ក្សេត្រសាស្ត្រដំណាំឧស្សាហកម្ម (កៅស៊ូ ស្វាយចន្ទី កាហ្វេ)",
+            tuition_per_year_usd: 300,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ជនជាតិដើមភាគតិច ១០០%", "អាហារូបករណ៍រដ្ឋ"],
+            related_majors: ["environmental_science"]
+          },
+          {
+            key: "environmental_science",
+            name_en: "Plateau Biodiversity Conservation",
+            name_km: "ការអភិរក្សជីវចម្រុះតំបន់ខ្ពង់រាប និងបរិស្ថាន",
+            tuition_per_year_usd: 300,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ក្រសួងបរិស្ថាន"],
+            related_majors: ["agriculture"]
+          },
+          {
+            key: "tourism_and_hospitality_management",
+            name_en: "Indigenous Cultural & Nature Tourism",
+            name_km: "ទេសចរណ៍ធម្មជាតិ និងវប្បធម៌ជនជាតិដើម",
+            tuition_per_year_usd: 320,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋ"],
+            related_majors: ["business_administration"]
+          }
+        ]
+      }
+    ]
+  },
+
+  // ─────────────────────────────────────────────
+  // 23. Mondulkiri (ខេត្តមណ្ឌលគិរី)
+  // ─────────────────────────────────────────────
+  {
+    id: "mpi",
+    name_en: "Mondulkiri Polytechnic Institute",
+    name_km: "វិទ្យាស្ថានពហុបច្ចេកទេសខេត្តមណ្ឌលគិរី",
+    short_name: "MPI",
+    location: "Sen Monorom, Mondulkiri Province",
+    province: "Mondulkiri",
+    province_km: "ខេត្តមណ្ឌលគិរី",
+    website: "https://www.mpi.edu.kh",
+    teaching_languages: ["Khmer"],
+    ranking: 3,
+    faculties: [
+      {
+        name_en: "Department of Ecotourism, Environment & Highland Farming",
+        name_km: "ដេប៉ាតឺម៉ង់ទេសចរណ៍ធម្មជាតិ បរិស្ថាន និងកសិកម្មតំបន់ត្រជាក់",
+        majors: [
+          {
+            key: "tourism_and_hospitality_management",
+            name_en: "Highland Eco-Tourism and Wildlife Guiding",
+            name_km: "ទេសចរណ៍ធម្មជាតិតំបន់ភ្នំ និងការគ្រប់គ្រងបដិសណ្ឋារកិច្ច",
+            tuition_per_year_usd: 320,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋាភិបាល ១០០%", "អាហារូបករណ៍ WCS/WWF"],
+            related_majors: ["environmental_science", "business_administration"]
+          },
+          {
+            key: "environmental_science",
+            name_en: "Wildlife and Forest Conservation",
+            name_km: "ការអភិរក្សសត្វព្រៃ និងព្រៃឈើតំបន់ខ្ពង់រាប",
+            tuition_per_year_usd: 300,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ក្រសួងបរិស្ថាន"],
+            related_majors: ["agriculture"]
+          },
+          {
+            key: "agriculture",
+            name_en: "Highland Horticulture (Avocado, Coffee, Flowers)",
+            name_km: "ក្សេត្រសាស្ត្រដំណាំតំបន់ត្រជាក់ (ប័រ កាហ្វេ ផ្កា និងបន្លែ)",
+            tuition_per_year_usd: 300,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋ"],
+            related_majors: ["environmental_science"]
+          }
+        ]
+      }
+    ]
+  },
+
+  // ─────────────────────────────────────────────
+  // 24. Prey Veng (ខេត្តព្រៃវែង)
+  // ─────────────────────────────────────────────
+  {
+    id: "csuk",
+    name_en: "Chea Sim University of Kamchaymear",
+    name_km: "សាកលវិទ្យាល័យជាស៊ីមកំចាយមារ",
+    short_name: "CSUK",
+    location: "Kamchay Mear District, Prey Veng Province",
+    province: "Prey Veng",
+    province_km: "ខេត្តព្រៃវែង",
+    website: "https://www.csuk.edu.kh",
+    teaching_languages: ["Khmer", "English"],
+    ranking: 2,
+    faculties: [
+      {
+        name_en: "Faculty of Agriculture and Veterinary Medicine",
+        name_km: "មហាវិទ្យាល័យកសិកម្ម និងបសុព្យាបាល",
+        majors: [
+          {
+            key: "agriculture",
+            name_en: "Agronomy and Animal Sciences",
+            name_km: "ក្សេត្រសាស្ត្រ និងវិទ្យាសាស្ត្រសត្វ",
+            tuition_per_year_usd: 350,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋាភិបាល ១០០%"],
+            related_majors: ["environmental_science"]
+          },
+          {
+            key: "environmental_science",
+            name_en: "Rural Ecology & Environmental Protection",
+            name_km: "បរិស្ថានវិទ្យាជនបទ និងការការពារធនធានធម្មជាតិ",
+            tuition_per_year_usd: 350,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋ"],
+            related_majors: ["agriculture"]
+          }
+        ]
+      },
+      {
+        name_en: "Faculty of Business Administration and IT",
+        name_km: "មហាវិទ្យាល័យគ្រប់គ្រងពាណិជ្ជកម្ម និងព័ត៌មានវិទ្យា",
+        majors: [
+          {
+            key: "business_administration",
+            name_en: "Business Administration",
+            name_km: "ការគ្រប់គ្រងពាណិជ្ជកម្ម",
+            tuition_per_year_usd: 380,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ CSUK"],
+            related_majors: ["accounting", "marketing"]
+          },
+          {
+            key: "accounting",
+            name_en: "Accounting",
+            name_km: "គណនេយ្យ",
+            tuition_per_year_usd: 380,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ CSUK"],
+            related_majors: ["business_administration"]
+          },
+          {
+            key: "computer_science",
+            name_en: "Information Technology",
+            name_km: "បច្ចេកវិទ្យាព័ត៌មាន",
+            tuition_per_year_usd: 400,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ CSUK"],
+            related_majors: ["software_engineering"]
+          }
+        ]
+      }
+    ]
+  },
+
+  // ─────────────────────────────────────────────
+  // 25. Svay Rieng (ខេត្តស្វាយរៀង)
+  // ─────────────────────────────────────────────
+  {
+    id: "sru",
+    name_en: "Svay Rieng University",
+    name_km: "សាកលវិទ្យាល័យស្វាយរៀង",
+    short_name: "SRU",
+    location: "Svay Rieng City, Svay Rieng Province",
+    province: "Svay Rieng",
+    province_km: "ខេត្តស្វាយរៀង",
+    website: "https://www.sru.edu.kh",
+    teaching_languages: ["Khmer", "English"],
+    ranking: 2,
+    faculties: [
+      {
+        name_en: "Faculty of Agriculture and Environment",
+        name_km: "មហាវិទ្យាល័យកសិកម្ម និងបរិស្ថាន",
+        majors: [
+          {
+            key: "agriculture",
+            name_en: "Agronomy and Agro-Industry",
+            name_km: "ក្សេត្រសាស្ត្រ និងកសិ-ឧស្សាហកម្ម",
+            tuition_per_year_usd: 360,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋាភិបាល ១០០%"],
+            related_majors: ["environmental_science"]
+          },
+          {
+            key: "environmental_science",
+            name_en: "Environmental Science",
+            name_km: "វិទ្យាសាស្ត្របរិស្ថាន",
+            tuition_per_year_usd: 360,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍រដ្ឋ"],
+            related_majors: ["agriculture"]
+          }
+        ]
+      },
+      {
+        name_en: "Faculty of Science, Technology and Engineering",
+        name_km: "មហាវិទ្យាល័យវិទ្យាសាស្ត្រ បច្ចេកវិទ្យា និងវិស្វកម្ម",
+        majors: [
+          {
+            key: "civil_engineering",
+            name_en: "Civil Engineering and Industrial Construction",
+            name_km: "វិស្វកម្មសំណង់ស៊ីវិល និងសំណង់ឧស្សាហកម្មតំបន់សេដ្ឋកិច្ចពិសេស",
+            tuition_per_year_usd: 400,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ SRU"],
+            related_majors: ["mechanical_engineering"]
+          },
+          {
+            key: "mechanical_engineering",
+            name_en: "Mechanical & Manufacturing Technology",
+            name_km: "បច្ចេកវិទ្យាមេកានិច និងផលិតកម្ម (SEZ)",
+            tuition_per_year_usd: 400,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ SRU"],
+            related_majors: ["civil_engineering"]
+          },
+          {
+            key: "computer_science",
+            name_en: "Computer Science",
+            name_km: "វិទ្យាសាស្ត្រកុំព្យូទ័រ",
+            tuition_per_year_usd: 400,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ SRU"],
+            related_majors: ["software_engineering"]
+          }
+        ]
+      },
+      {
+        name_en: "Faculty of Business Administration",
+        name_km: "មហាវិទ្យាល័យគ្រប់គ្រងពាណិជ្ជកម្ម",
+        majors: [
+          {
+            key: "business_administration",
+            name_en: "Special Economic Zone (SEZ) Management & Trade",
+            name_km: "ការគ្រប់គ្រងពាណិជ្ជកម្ម និងតំបន់សេដ្ឋកិច្ចពិសេស (បាវិត)",
+            tuition_per_year_usd: 380,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ SRU"],
+            related_majors: ["accounting", "marketing"]
+          },
+          {
+            key: "accounting",
+            name_en: "Accounting and Finance",
+            name_km: "គណនេយ្យ និងហិរញ្ញវត្ថុ",
+            tuition_per_year_usd: 380,
+            admission_requirements: ["សញ្ញាបត្របាក់ឌុប"],
+            scholarships: ["អាហារូបករណ៍ SRU"],
+            related_majors: ["business_administration"]
+          }
+        ]
+      }
+    ]
+  }
+];
+
+const database = {
+  version: "2.2.0",
+  description: "Comprehensive database of higher education institutions across all 25 provinces of Cambodia with faculties, majors, tuition fees, and admission criteria.",
+  provinces_count: 25,
+  universities_count: universities.length,
+  universities: universities
+};
+
+fs.writeFileSync(
+  path.join(__dirname, '../universities.json'),
+  JSON.stringify(database, null, 2),
+  'utf8'
+);
+
+console.log(`Generated universities.json with ${universities.length} universities across all 25 provinces!`);

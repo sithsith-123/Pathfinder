@@ -4,11 +4,12 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowRight, ArrowLeft, Check, CheckCircle2,
   ChevronDown, ExternalLink, GraduationCap, MapPin, RotateCcw, X,
+  Compass, Award, Clock, Filter, Building2,
 } from 'lucide-react';
 import { assessmentQuestions } from '@/data/questions-km';
 import { getAssessmentResults } from '@/lib/scoring';
 import { getStrongestInterests, riasecToInterestScores } from '@/lib/interest-mapping';
-import { majorNameToKey, matchMajorToUniversities, type UniversityMatch } from '@/lib/university-matching';
+import { majorNameToKey, matchMajorToUniversities, filterMatchesByProvince, type UniversityMatch } from '@/lib/university-matching';
 import type { DimensionKey, Question, Screen } from '@/types/assessment';
 
 const TOTAL_QUESTIONS = assessmentQuestions.length;
@@ -255,58 +256,127 @@ function Book3D() {
 ───────────────────────────────────────────── */
 function WelcomeScreen({ onStart }: { onStart: () => void }) {
   return (
-    <div className="screen-enter min-h-[100svh] bg-surface">
-      <header className="site-header px-6 py-4 sm:px-10">
-        <span className="text-xs font-semibold uppercase tracking-widest text-secondary">Pathfinder</span>
+    <div className="screen-enter flex min-h-[100svh] flex-col justify-between bg-surface">
+      {/* ── Top Header Bar ── */}
+      <header className="site-header px-6 py-4 sm:px-10 lg:px-16">
+        <div className="mx-auto flex max-w-6xl items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <span className="font-sans text-xs font-bold uppercase tracking-[0.25em] text-primary">
+              PATHFINDER
+            </span>
+            <span className="rounded-[4px] bg-accent/10 px-2 py-0.5 font-sans text-[10px] font-bold text-accent">
+              ២០២៦
+            </span>
+          </div>
+          <span className="font-sans text-xs font-medium text-secondary hidden sm:inline-block">
+            ការវាយតម្លៃជំនាញសិក្សា & អាជីព
+          </span>
+        </div>
       </header>
 
-      <main className="min-h-[calc(100svh-57px)] px-6 py-10 sm:px-10 sm:py-16 lg:px-16">
-        <div className="mx-auto grid max-w-5xl items-center gap-10 lg:grid-cols-2 lg:gap-16">
+      {/* ── Centered Hero Section ── */}
+      <main className="my-auto w-full px-6 py-8 sm:px-10 sm:py-12 lg:px-16 lg:py-14">
+        <div className="mx-auto grid max-w-6xl items-center gap-10 lg:grid-cols-12 lg:gap-14">
 
-          {/* ── Left: hero text ── */}
-          <div>
-            <p className="hero-line mb-5 text-xs font-semibold uppercase tracking-widest text-accent">
-              ការវាយតម្លៃអាជីព
-            </p>
+          {/* Left Column: Hero Text & Call to Action */}
+          <div className="lg:col-span-7">
+            <div className="hero-line mb-4 inline-flex items-center gap-2 rounded-[6px] border border-accent/20 bg-accent/5 px-3 py-1 font-sans text-xs font-bold uppercase tracking-wider text-accent">
+              <Compass className="h-3.5 w-3.5" />
+              <span>ការវាយតម្លៃអាជីពសាកលវិទ្យាល័យ</span>
+            </div>
 
-            <h1 className="hero-line text-4xl font-bold leading-tight tracking-tight text-primary sm:text-5xl sm:leading-[1.15]">
+            <h1 className="hero-line font-sans text-4xl font-bold leading-[1.25] tracking-tight text-primary sm:text-5xl sm:leading-[1.18] lg:text-[52px]">
               ស្គាល់ចំណាប់អារម្មណ៍
               <br />
               <span className="text-accent">ស្វែងយល់ពីអនាគត</span>
             </h1>
 
-            <p className="hero-line mt-5 max-w-xl text-base leading-7 text-secondary sm:text-lg sm:leading-8">
+            <p className="hero-line mt-5 max-w-xl font-sans text-base leading-7 text-secondary sm:text-lg sm:leading-8">
               ឆ្លើយសំណួរអំពីចំណាប់អារម្មណ៍ ចំណុចខ្លាំង និងគោលដៅរបស់អ្នក
-              ដើម្បីស្វែងរកជំនាញសាកលវិទ្យាល័យ និងផ្លូវអាជីពដែលអាចសមស្របនឹងអ្នក។
+              ដើម្បីស្វែងរកជំនាញសាកលវិទ្យាល័យ និងផ្លូវអាជីពជាក់ស្តែងដែលអាចសមស្របបំផុតនឹងអ្នក។
             </p>
 
-            <div className="hero-line mt-7 flex flex-wrap gap-5 text-sm text-secondary">
-              {['២០ សំណួរ', 'ប្រហែល ៤–៦ នាទី', 'គ្មានចម្លើយត្រូវ ឬខុស'].map((label) => (
-                <div key={label} className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-accent" />
-                  <span>{label}</span>
-                </div>
-              ))}
+            {/* Micro details pills */}
+            <div className="hero-line mt-6 flex flex-wrap gap-4 text-sm text-secondary">
+              <div className="flex items-center gap-2 rounded-[6px] border border-border bg-white px-3 py-1.5 shadow-sm">
+                <Clock className="h-3.5 w-3.5 text-accent" />
+                <span className="font-sans font-medium text-xs sm:text-sm">២០ សំណួរ (៤–៦ នាទី)</span>
+              </div>
+              <div className="flex items-center gap-2 rounded-[6px] border border-border bg-white px-3 py-1.5 shadow-sm">
+                <Award className="h-3.5 w-3.5 text-accent" />
+                <span className="font-sans font-medium text-xs sm:text-sm">គ្មានចម្លើយត្រូវ ឬខុស</span>
+              </div>
             </div>
 
-            <div className="hero-line">
+            {/* Action button */}
+            <div className="hero-line mt-8 flex flex-wrap items-center gap-4">
               <button
                 onClick={onStart}
-                className="btn-primary mt-9 inline-flex items-center gap-3 rounded-[8px] bg-accent px-6 py-3.5 text-base font-semibold text-white hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+                className="btn-primary inline-flex items-center gap-3 rounded-[8px] bg-accent px-7 py-4 font-sans text-base font-bold text-white shadow-md hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
               >
-                ចាប់ផ្តើម
+                ចាប់ផ្តើមការវាយតម្លៃ
                 <ArrowRight className="h-4 w-4" />
               </button>
+              <span className="font-sans text-xs text-secondary">
+                ឥតគិតថ្លៃ ១០០% • មិនចាំបាច់ចុះឈ្មោះ
+              </span>
             </div>
           </div>
 
-          {/* ── Right: 3D floating book ── */}
-          <div className="flex justify-center lg:justify-end">
+          {/* Right Column: 3D Floating Book */}
+          <div className="flex justify-center lg:col-span-5 lg:justify-end">
             <Book3D />
           </div>
 
         </div>
       </main>
+
+      {/* ── Grounding Feature Strip (Balances Bottom Space) ── */}
+      <footer className="border-t border-border/80 bg-white/70 py-6 backdrop-blur-sm px-6 sm:px-10 lg:px-16">
+        <div className="mx-auto max-w-6xl grid grid-cols-1 gap-6 sm:grid-cols-3 sm:gap-8">
+          <div className="flex items-start gap-3">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[6px] border border-border bg-surface text-accent">
+              <Compass className="h-4 w-4" />
+            </div>
+            <div>
+              <h4 className="font-sans text-xs font-bold uppercase tracking-wider text-primary">
+                វិធីសាស្ត្រ RIASEC
+              </h4>
+              <p className="mt-0.5 font-sans text-xs leading-5 text-secondary">
+                ផ្អែកលើ ៦ វិមាត្របុគ្គលិកលក្ខណៈ ដើម្បីផ្គូផ្គងជំនាញត្រូវនឹងខ្លួន។
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-3">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[6px] border border-border bg-surface text-accent">
+              <GraduationCap className="h-4 w-4" />
+            </div>
+            <div>
+              <h4 className="font-sans text-xs font-bold uppercase tracking-wider text-primary">
+                ទិន្នន័យជាក់ស្តែង
+              </h4>
+              <p className="mt-0.5 font-sans text-xs leading-5 text-secondary">
+                ភ្ជាប់ជាមួយសាកលវិទ្យាល័យ តម្លៃសិក្សា និងតម្រូវការចូលរៀននៅកម្ពុជា។
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-3">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[6px] border border-border bg-surface text-accent">
+              <CheckCircle2 className="h-4 w-4 text-success" />
+            </div>
+            <div>
+              <h4 className="font-sans text-xs font-bold uppercase tracking-wider text-primary">
+                លទ្ធផលលម្អិតភ្លាមៗ
+              </h4>
+              <p className="mt-0.5 font-sans text-xs leading-5 text-secondary">
+                ទទួលបានរបាយការណ៍ជំនាញ ១០ និងផ្លូវអាជីព ១០ បន្ទាប់ពីឆ្លើយរួច។
+              </p>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
@@ -501,7 +571,15 @@ function AnalysisScreen() {
 /* ─────────────────────────────────────────────
    University Card
 ───────────────────────────────────────────── */
-function UniversityCard({ match }: { match: UniversityMatch }) {
+function UniversityCard({
+  match,
+  rank,
+  isTopPick,
+}: {
+  match: UniversityMatch;
+  rank?: number;
+  isTopPick?: boolean;
+}) {
   const { university, faculty, major, matchType } = match;
   const isExact = matchType === 'exact';
   const tuition = typeof major.tuition_per_year_usd === 'number'
@@ -510,72 +588,113 @@ function UniversityCard({ match }: { match: UniversityMatch }) {
   const admissionRequirements = major.admission_requirements ?? [];
   const scholarships = major.scholarships ?? [];
   const teachingLanguages = university.teaching_languages ?? [];
+  const provinceLabel = university.province_km || university.province || university.location;
 
   return (
-    <article className="flex min-w-0 flex-col rounded-[12px] border border-border bg-surface p-5 transition-shadow duration-200 hover:shadow-card">
+    <article
+      className={`flex min-w-0 flex-col rounded-[12px] border p-5 transition-all duration-200 hover:shadow-card ${
+        isTopPick
+          ? 'border-accent/40 bg-white ring-1 ring-accent/20'
+          : 'border-border bg-surface'
+      }`}
+    >
+      {/* Header with rank badge and university name */}
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h4 className="break-words text-base font-semibold text-primary">{university.name_en}</h4>
-          <p className="mt-0.5 break-words text-sm text-secondary">{university.name_km}</p>
+          <div className="flex flex-wrap items-center gap-2">
+            {rank && rank <= 3 ? (
+              <span
+                className={`shrink-0 rounded-[6px] px-2 py-0.5 font-sans text-[11px] font-bold ${
+                  rank === 1
+                    ? 'bg-amber-500 text-white shadow-sm'
+                    : rank === 2
+                    ? 'bg-slate-700 text-white'
+                    : 'bg-accent text-white'
+                }`}
+              >
+                #{rank} កំពូលជម្រើសណែនាំ
+              </span>
+            ) : null}
+            <h4 className="break-words font-sans text-base font-bold text-primary">{university.name_en}</h4>
+          </div>
+          <p className="mt-1 break-words font-sans text-sm font-semibold text-secondary">{university.name_km}</p>
         </div>
-        <span className={`badge-pop shrink-0 whitespace-nowrap rounded-[6px] px-2 py-1 text-xs font-semibold ${
-          isExact ? 'bg-accent/10 text-accent' : 'border border-border bg-white text-secondary'
-        }`}>
+
+        <span
+          className={`badge-pop shrink-0 whitespace-nowrap rounded-[6px] px-2.5 py-1 font-sans text-xs font-semibold ${
+            isExact ? 'bg-accent/10 text-accent' : 'border border-border bg-white text-secondary'
+          }`}
+        >
           {isExact ? 'ជំនាញដូចគ្នា' : 'ជំនាញជិតស្និទ្ធ'}
         </span>
       </div>
 
-      <div className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-secondary">
-        <span className="inline-flex items-center gap-1.5">
-          <MapPin className="h-3.5 w-3.5 shrink-0" />
-          {university.location}
+      {/* Location / Province tags */}
+      <div className="mt-3 flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-xs text-secondary">
+        <span className="inline-flex items-center gap-1.5 rounded-[4px] border border-border bg-white px-2.5 py-1 font-sans font-medium text-primary shadow-sm">
+          <MapPin className="h-3.5 w-3.5 text-accent shrink-0" />
+          {provinceLabel}
         </span>
-        {university.short_name ? <span className="font-medium text-primary">{university.short_name}</span> : null}
+        {university.short_name ? (
+          <span className="rounded-[4px] bg-accent/5 px-2 py-1 font-sans font-bold text-accent">
+            {university.short_name}
+          </span>
+        ) : null}
+        {university.location && university.location !== provinceLabel ? (
+          <span className="font-sans text-secondary">{university.location}</span>
+        ) : null}
       </div>
 
-      <dl className="mt-4 space-y-1.5 text-sm">
+      {/* Degree & Tuition Details */}
+      <dl className="mt-4 space-y-2 border-t border-border/70 pt-3 text-sm">
         <div className="flex flex-wrap gap-x-2">
-          <dt className="font-semibold text-primary">មហាវិទ្យាល័យ៖</dt>
-          <dd className="min-w-0 break-words text-secondary">{faculty.name_km}</dd>
+          <dt className="font-sans font-semibold text-primary">មហាវិទ្យាល័យ៖</dt>
+          <dd className="min-w-0 break-words font-sans text-secondary">{faculty.name_km}</dd>
         </div>
         <div className="flex flex-wrap gap-x-2">
-          <dt className="font-semibold text-primary">ជំនាញ៖</dt>
-          <dd className="min-w-0 break-words text-secondary">{major.name_km} ({major.name_en})</dd>
+          <dt className="font-sans font-semibold text-primary">ជំនាញ៖</dt>
+          <dd className="min-w-0 break-words font-sans font-medium text-text">
+            {major.name_km} ({major.name_en})
+          </dd>
         </div>
-        <div className="flex flex-wrap gap-x-2">
-          <dt className="font-semibold text-primary">ថ្លៃសិក្សាប្រចាំឆ្នាំ៖</dt>
-          <dd className="tabular-nums font-medium text-text">{tuition ? `${tuition} USD` : 'មិនមានទិន្នន័យ'}</dd>
+        <div className="flex flex-wrap items-center gap-x-2">
+          <dt className="font-sans font-semibold text-primary">ថ្លៃសិក្សាប្រចាំឆ្នាំ៖</dt>
+          <dd className="tabular-nums font-sans font-bold text-accent">
+            {tuition ? `${tuition} USD / ឆ្នាំ` : 'មិនមានទិន្នន័យជាក់លាក់'}
+          </dd>
         </div>
         {teachingLanguages.length > 0 ? (
           <div className="flex flex-wrap gap-x-2">
-            <dt className="font-semibold text-primary">ភាសាបង្រៀន៖</dt>
-            <dd className="min-w-0 text-secondary">{teachingLanguages.join(' · ')}</dd>
+            <dt className="font-sans font-semibold text-primary">ភាសាបង្រៀន៖</dt>
+            <dd className="min-w-0 font-sans text-secondary">{teachingLanguages.join(' · ')}</dd>
           </div>
         ) : null}
       </dl>
 
-      <div className="mt-4">
-        <h5 className="text-sm font-semibold text-primary">តម្រូវការចូលរៀន</h5>
+      {/* Admission requirements */}
+      <div className="mt-3.5">
+        <h5 className="font-sans text-xs font-bold uppercase tracking-wider text-primary">តម្រូវការចូលរៀន</h5>
         {admissionRequirements.length > 0 ? (
-          <ul className="mt-2 space-y-1.5 text-sm leading-6 text-secondary">
+          <ul className="mt-1.5 space-y-1 font-sans text-xs leading-5 text-secondary">
             {admissionRequirements.map((req, i) => (
-              <li key={`${i}-${req}`} className="flex items-start gap-2">
-                <CheckCircle2 className="mt-1 h-3.5 w-3.5 shrink-0 text-success" />
+              <li key={`${i}-${req}`} className="flex items-start gap-1.5">
+                <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-success" />
                 <span className="min-w-0 break-words">{req}</span>
               </li>
             ))}
           </ul>
         ) : (
-          <p className="mt-2 text-sm text-secondary">មិនមានទិន្នន័យ</p>
+          <p className="mt-1 font-sans text-xs text-secondary">សញ្ញាបត្រមធ្យមសិក្សាទុតិយភូមិ (បាក់ឌុប)</p>
         )}
       </div>
 
+      {/* Scholarships */}
       {scholarships.length > 0 ? (
-        <div className="mt-4">
-          <h5 className="text-sm font-semibold text-primary">អាហារូបកម្ម</h5>
-          <div className="mt-2 flex flex-wrap gap-1.5">
+        <div className="mt-3">
+          <h5 className="font-sans text-xs font-bold uppercase tracking-wider text-primary">អាហារូបករណ៍</h5>
+          <div className="mt-1.5 flex flex-wrap gap-1.5">
             {scholarships.map((s, i) => (
-              <span key={`${i}-${s}`} className="rounded-[6px] border border-border bg-white px-2.5 py-1 text-xs text-secondary">
+              <span key={`${i}-${s}`} className="rounded-[4px] border border-border bg-white px-2 py-0.5 font-sans text-[11px] font-medium text-secondary">
                 {s}
               </span>
             ))}
@@ -583,20 +702,22 @@ function UniversityCard({ match }: { match: UniversityMatch }) {
         </div>
       ) : null}
 
-      <p className="mt-4 text-sm leading-6 text-secondary">
-        <span className="font-semibold text-primary">ហេតុអ្វីសមស្រប៖</span>{' '}
+      <p className="mt-3.5 font-sans text-xs leading-5 text-secondary">
+        <span className="font-bold text-primary">ហេតុអ្វីសមស្រប៖</span>{' '}
         {isExact
           ? 'សាលានេះផ្តល់ជូនជំនាញដែលបានណែនាំដោយផ្ទាល់។'
           : 'សាលានេះផ្តល់ជូនជំនាញជិតស្និទ្ធជាមួយជំនាញដែលបានណែនាំ។'}
       </p>
 
       {university.website ? (
-        <div className="mt-auto pt-4">
+        <div className="mt-auto pt-4 border-t border-border/70">
           <a
-            href={university.website} target="_blank" rel="noopener noreferrer"
-            className="btn-ghost inline-flex items-center gap-2 rounded-[8px] border border-border bg-white px-4 py-2 text-sm font-medium text-primary transition-colors hover:border-accent/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+            href={university.website}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-ghost inline-flex w-full items-center justify-center gap-2 rounded-[6px] border border-border bg-white px-3 py-2 font-sans text-xs font-semibold text-primary hover:border-accent/50 hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
           >
-            ទៅកាន់គេហទំព័រផ្លូវការ
+            <span>ទៅកាន់គេហទំព័រផ្លូវការ {university.short_name || ''}</span>
             <ExternalLink className="h-3.5 w-3.5" />
           </a>
         </div>
@@ -622,7 +743,11 @@ function useBarAnimation(value: number, delay = 0) {
 ───────────────────────────────────────────── */
 function ResultsScreen({ result, onRetake }: { result: ReturnType<typeof getAssessmentResults>; onRetake: () => void }) {
   const radarLevels = [20, 40, 60, 80, 100];
-  const [selectedMajorName, setSelectedMajorName] = useState<string | null>(null);
+  const [selectedMajorName, setSelectedMajorName] = useState<string | null>(
+    () => result.majorRecommendations[0]?.nameEnglish ?? null,
+  );
+  const [selectedProvince, setSelectedProvince] = useState<string>('all');
+  const [showAllMatches, setShowAllMatches] = useState<boolean>(false);
   const universitySectionRef = useRef<HTMLElement>(null);
 
   // Animate radar polygon draw-on
@@ -661,15 +786,48 @@ function ResultsScreen({ result, onRetake }: { result: ReturnType<typeof getAsse
 
   const interestScores = useMemo(() => riasecToInterestScores(result.normalizedScores), [result.normalizedScores]);
   const strongestInterests = useMemo(() => getStrongestInterests(interestScores, 3), [interestScores]);
+
   const selectedMajor = selectedMajorName
     ? result.majorRecommendations.find((m) => m.nameEnglish === selectedMajorName) ?? null
     : null;
-  const universityMatches = useMemo(
+
+  const allUniversityMatches = useMemo(
     () => (selectedMajor ? matchMajorToUniversities(majorNameToKey(selectedMajor.nameEnglish)) : []),
     [selectedMajor],
   );
 
-  const toggleMajor = (name: string) => setSelectedMajorName((cur) => (cur === name ? null : name));
+  const availableProvinces = useMemo(() => {
+    const provinceMap = new Map<string, { en: string; km: string; count: number }>();
+    for (const m of allUniversityMatches) {
+      const pEn = m.university.province ?? 'Phnom Penh';
+      const pKm = m.university.province_km ?? pEn;
+      if (!provinceMap.has(pEn)) {
+        provinceMap.set(pEn, { en: pEn, km: pKm, count: 0 });
+      }
+      provinceMap.get(pEn)!.count += 1;
+    }
+    return Array.from(provinceMap.values()).sort((a, b) => b.count - a.count);
+  }, [allUniversityMatches]);
+
+  const filteredMatches = useMemo(() => {
+    return filterMatchesByProvince(allUniversityMatches, selectedProvince);
+  }, [allUniversityMatches, selectedProvince]);
+
+  const displayedMatches = useMemo(() => {
+    if (showAllMatches || selectedProvince !== 'all') {
+      return filteredMatches;
+    }
+    return filteredMatches.slice(0, 3);
+  }, [filteredMatches, showAllMatches, selectedProvince]);
+
+  const toggleMajor = (name: string) => {
+    setSelectedMajorName((cur) => {
+      if (cur === name) return null;
+      setSelectedProvince('all');
+      setShowAllMatches(false);
+      return name;
+    });
+  };
 
   useEffect(() => {
     if (!selectedMajorName || !universitySectionRef.current) return;
@@ -786,12 +944,15 @@ function ResultsScreen({ result, onRetake }: { result: ReturnType<typeof getAsse
             <div className="grid gap-3 xl:grid-cols-2">
               {result.majorRecommendations.map((major, index) => {
                 const isSelected = selectedMajorName === major.nameEnglish;
+                const majorMatches = matchMajorToUniversities(majorNameToKey(major.nameEnglish));
+                const top3 = majorMatches.slice(0, 3);
+
                 return (
                   <article
                     key={major.name}
                     style={{ animationDelay: `${200 + index * 40}ms` }}
                     className={`recommendation-card cursor-pointer rounded-[12px] border p-5 ${
-                      isSelected ? 'border-accent bg-accent/5' : 'border-border bg-surface'
+                      isSelected ? 'border-accent bg-accent/5 ring-1 ring-accent/30' : 'border-border bg-surface'
                     }`}
                     role="button" tabIndex={0}
                     aria-expanded={isSelected}
@@ -812,10 +973,32 @@ function ResultsScreen({ result, onRetake }: { result: ReturnType<typeof getAsse
                       <div><span className="font-semibold text-primary">ជំនាញ៖</span> {major.skills.join(' · ')}</div>
                       <div><span className="font-semibold text-primary">អ្វីដែលត្រូវសិក្សា៖</span> {major.learningAreas.join(' · ')}</div>
                     </div>
-                    <div className="mt-4 flex items-center justify-between gap-2 border-t border-border pt-3 text-sm">
-                      <span className="inline-flex items-center gap-1.5 font-medium text-primary">
-                        <GraduationCap className="h-4 w-4" />
-                        {isSelected ? 'លាក់សាកលវិទ្យាល័យ' : 'ស្វែងរកសាកលវិទ្យាល័យ'}
+
+                    {/* Top 3 Universities Badges */}
+                    {top3.length > 0 ? (
+                      <div className="mt-4 pt-3 border-t border-border/70">
+                        <div className="flex items-center gap-1.5 text-xs font-bold text-accent mb-2">
+                          <GraduationCap className="h-3.5 w-3.5" />
+                          <span>សាកលវិទ្យាល័យកំពូលទាំង ៣៖</span>
+                        </div>
+                        <div className="flex flex-wrap gap-1.5">
+                          {top3.map((m, idx) => (
+                            <span
+                              key={m.university.id}
+                              className="inline-flex items-center gap-1 rounded-[6px] border border-border bg-white px-2 py-1 font-sans text-xs font-semibold text-primary shadow-xs"
+                            >
+                              <span className="rounded-[4px] bg-accent/15 px-1 text-[10px] font-bold text-accent">#{idx + 1}</span>
+                              <span>{m.university.short_name || m.university.name_km}</span>
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    ) : null}
+
+                    <div className="mt-3.5 flex items-center justify-between gap-2 border-t border-border/60 pt-2.5 text-xs sm:text-sm">
+                      <span className="inline-flex items-center gap-1.5 font-bold text-accent">
+                        <Building2 className="h-4 w-4" />
+                        {isSelected ? 'កំពុងពិនិត្យមើលសាកលវិទ្យាល័យ' : 'មើលព័ត៌មានលម្អិត និងថ្លៃសិក្សា'}
                       </span>
                       <ChevronDown className={`h-4 w-4 text-secondary transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${isSelected ? 'rotate-180 text-accent' : ''}`} />
                     </div>
@@ -834,18 +1017,23 @@ function ResultsScreen({ result, onRetake }: { result: ReturnType<typeof getAsse
               aria-labelledby="university-section-title"
               className="section-enter rounded-[12px] border border-border bg-white p-6 sm:p-8"
             >
-              <div className="flex items-start justify-between gap-4">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div>
-                  <h3 id="university-section-title" className="text-lg font-semibold text-primary">
+                  <div className="mb-2 inline-flex items-center gap-2 rounded-[6px] bg-accent/10 px-2.5 py-1 text-xs font-bold text-accent">
+                    <Building2 className="h-3.5 w-3.5" />
+                    <span>រកឃើញ {allUniversityMatches.length} សាកលវិទ្យាល័យនៅកម្ពុជា</span>
+                  </div>
+                  <h3 id="university-section-title" className="font-sans text-xl font-bold text-primary sm:text-2xl">
                     សាកលវិទ្យាល័យសម្រាប់ {selectedMajor.name}
                   </h3>
-                  <p className="mt-0.5 text-sm text-secondary">{selectedMajor.nameEnglish}</p>
+                  <p className="mt-0.5 font-sans text-sm font-semibold text-secondary">{selectedMajor.nameEnglish}</p>
                 </div>
+
                 <button
                   type="button"
                   onClick={() => toggleMajor(selectedMajor.nameEnglish)}
                   aria-label="បិទ"
-                  className="btn-ghost inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-[6px] border border-border text-secondary transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+                  className="btn-ghost inline-flex h-9 w-9 shrink-0 items-center justify-center self-start rounded-[6px] border border-border text-secondary transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -853,34 +1041,108 @@ function ResultsScreen({ result, onRetake }: { result: ReturnType<typeof getAsse
 
               {strongestInterests.length > 0 ? (
                 <div className="mt-4 flex flex-wrap items-center gap-2 text-sm text-secondary">
-                  <span className="font-medium">ចំណាប់អារម្មណ៍ដែលពាក់ព័ន្ធ៖</span>
+                  <span className="font-sans font-medium text-xs sm:text-sm">ចំណាប់អារម្មណ៍ដែលពាក់ព័ន្ធ៖</span>
                   {strongestInterests.map(({ key, score }) => (
-                    <span key={key} className="badge-pop rounded-[6px] bg-accent/10 px-2.5 py-1 text-xs font-semibold text-accent">
+                    <span key={key} className="badge-pop rounded-[6px] bg-accent/10 px-2.5 py-1 font-sans text-xs font-bold text-accent">
                       {interestLabels[key] ?? key} {score}%
                     </span>
                   ))}
                 </div>
               ) : null}
 
-              <p className="mt-4 max-w-3xl text-sm leading-6 text-secondary">
-                ថ្លៃសិក្សា និងលក្ខខណ្ឌចូលរៀនខាងក្រោមជាព័ត៌មានណែនាំបឋម។ សូមពិនិត្យមើលព័ត៌មានបច្ចុប្បន្ននៅគេហទំព័រផ្លូវការរបស់សាលាមុននឹងសម្រេចចិត្ត។
-              </p>
+              {/* Sub-header bar: Top 3 status & Province Filter */}
+              <div className="mt-6 flex flex-col gap-3.5 rounded-[10px] border border-border bg-surface p-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="font-sans text-xs font-bold uppercase tracking-wider text-accent">
+                    {selectedProvince === 'all' && !showAllMatches
+                      ? '★ កំពូលសាកលវិទ្យាល័យទាំង ៣ ដែលណែនាំបំផុត (Top 3 Recommended)'
+                      : `សាកលវិទ្យាល័យដែលបានជ្រើសរើស (${filteredMatches.length} សាលា)`}
+                  </p>
+                  <p className="mt-0.5 font-sans text-xs text-secondary">
+                    {selectedProvince === 'all' && !showAllMatches
+                      ? 'ជ្រើសរើសដោយផ្អែកលើកិត្យានុភាព គុណភាពបណ្តុះបណ្តាល និងឱកាសការងារជាក់ស្តែង'
+                      : selectedProvince !== 'all'
+                      ? 'បង្ហាញស្ថាប័នក្នុងខេត្តដែលបានជ្រើសរើស (ជ្រើសរើស «គ្រប់ ២៥ ខេត្ត/រាជធានី» ដើម្បីមើលកំពូលទាំង ៣ ថ្នាក់ជាតិ)'
+                      : 'សាកលវិទ្យាល័យដែលផ្តល់ជូនជំនាញនេះនៅទូទាំងប្រទេសកម្ពុជា'}
+                  </p>
+                </div>
 
-              {universityMatches.length === 0 ? (
-                <div className="mt-5 rounded-[8px] border border-border bg-surface p-5">
-                  <p className="font-semibold text-primary">មិនមានសាកលវិទ្យាល័យក្នុងទិន្នន័យរបស់យើងនៅឡើយទេ។</p>
-                  <p className="mt-1.5 text-sm leading-6 text-secondary">
-                    ទិន្នន័យសាកលវិទ្យាល័យរបស់យើងនៅមានកំណត់។ អ្នកអាចស្វែងយល់បន្ថែមពីជំនាញ ឬពិគ្រាប់ដោយផ្ទាល់ជាមួយសាលា។
+                {/* Province Filter Dropdown */}
+                <div className="flex items-center gap-2 shrink-0">
+                  <Filter className="h-4 w-4 text-accent" />
+                  <label htmlFor="province-filter" className="sr-only">
+                    ជ្រើសរើសខេត្ត/ក្រុង
+                  </label>
+                  <select
+                    id="province-filter"
+                    value={selectedProvince}
+                    onChange={(e) => {
+                      setSelectedProvince(e.target.value);
+                      setShowAllMatches(true);
+                    }}
+                    className="cursor-pointer rounded-[6px] border border-border bg-white px-3 py-1.5 font-sans text-xs font-bold text-primary shadow-sm hover:border-accent/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+                  >
+                    <option value="all">គ្រប់ ២៥ ខេត្ត/រាជធានី (សរុប {allUniversityMatches.length})</option>
+                    {availableProvinces.map((p) => (
+                      <option key={p.en} value={p.en}>
+                        {p.km} ({p.count})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* University Cards Grid */}
+              {filteredMatches.length === 0 ? (
+                <div className="mt-5 rounded-[8px] border border-border bg-surface p-6 text-center">
+                  <p className="font-sans text-base font-bold text-primary">មិនមានសាកលវិទ្យាល័យក្នុងខេត្តនេះនៅឡើយទេ</p>
+                  <p className="mt-1 font-sans text-xs text-secondary">
+                    សូមជ្រើសរើស «គ្រប់ ២៥ ខេត្ត/រាជធានី» ដើម្បីស្វែងរកសាកលវិទ្យាល័យនៅទូទាំងប្រទេស។
                   </p>
                 </div>
               ) : (
-                <div className="mt-5 grid gap-4 md:grid-cols-2">
-                  {universityMatches.map((match) => (
+                <div className="mt-5 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {displayedMatches.map((match, idx) => (
                     <UniversityCard
                       key={`${match.university.id}-${match.faculty.name_en}-${match.major.key}`}
                       match={match}
+                      rank={selectedProvince === 'all' ? idx + 1 : undefined}
+                      isTopPick={idx < 3 && selectedProvince === 'all'}
                     />
                   ))}
+                </div>
+              )}
+
+              {/* View More / Collapse Toggle */}
+              {allUniversityMatches.length > 3 && selectedProvince === 'all' && (
+                <div className="mt-6 flex justify-center">
+                  <button
+                    type="button"
+                    onClick={() => setShowAllMatches(!showAllMatches)}
+                    className="inline-flex items-center gap-2 rounded-[8px] border border-accent/40 bg-accent/5 px-5 py-2.5 font-sans text-xs font-bold text-accent transition-colors hover:bg-accent/10"
+                  >
+                    {showAllMatches
+                      ? 'បង្រួមមកកំពូល ៣ សាកលវិទ្យាល័យ'
+                      : `មើលសាកលវិទ្យាល័យទាំងអស់តាមបណ្តាខេត្ត (សរុប ${allUniversityMatches.length} សាលា)`}
+                    <ChevronDown
+                      className={`h-4 w-4 transition-transform duration-200 ${showAllMatches ? 'rotate-180' : ''}`}
+                    />
+                  </button>
+                </div>
+              )}
+
+              {selectedProvince !== 'all' && (
+                <div className="mt-6 flex justify-center">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedProvince('all');
+                      setShowAllMatches(false);
+                    }}
+                    className="btn-ghost inline-flex items-center gap-1.5 rounded-[8px] border border-border bg-white px-4 py-2 font-sans text-xs font-bold text-primary shadow-xs transition hover:border-accent/40 hover:text-accent"
+                  >
+                    <span>← ត្រឡប់ទៅមើលសាកលវិទ្យាល័យកំពូលទាំង ៣ ទូទាំងប្រទេស</span>
+                  </button>
                 </div>
               )}
             </section>

@@ -9,27 +9,28 @@ test('majorNameToKey normalizes English major names to university keys', () => {
   assert.equal(majorNameToKey(''), '');
 });
 
-test('finds an exact university match with tuition and admission data, listed before related matches', () => {
+test('finds exact university matches with tuition and admission data, listed before related matches', () => {
   const matches = matchMajorToUniversities('computer_science');
 
-  assert.ok(matches.length >= 1);
+  assert.ok(matches.length >= 3);
   assert.equal(matches[0].matchType, 'exact');
 
   const exact = matches.filter((match) => match.matchType === 'exact');
-  assert.equal(exact.length, 1);
-  const [match] = exact;
-  assert.equal(match.university.short_name, 'RUPP');
-  assert.equal(match.faculty.name_en, 'Faculty of Science');
-  assert.equal(match.major.tuition_per_year_usd, 450);
-  assert.ok((match.major.admission_requirements ?? []).length > 0);
+  assert.ok(exact.length >= 3);
+  const rupp = exact.find((m) => m.university.short_name === 'RUPP');
+  assert.ok(rupp);
+  assert.equal(rupp.faculty.name_en, 'Faculty of Science');
+  assert.equal(rupp.major.tuition_per_year_usd, 500);
+  assert.ok((rupp.major.admission_requirements ?? []).length > 0);
 });
 
-test('falls back to related matches when the exact major is not offered', () => {
+test('finds matches for software engineering with exact degrees', () => {
   const matches = matchMajorToUniversities('software_engineering');
 
-  assert.ok(matches.length > 0);
-  assert.ok(matches.every((match) => match.matchType === 'related'));
-  assert.ok(matches.some((match) => match.major.related_majors?.includes('software_engineering')));
+  assert.ok(matches.length >= 3);
+  assert.equal(matches[0].matchType, 'exact');
+  const exactMajors = matches.filter((m) => m.matchType === 'exact');
+  assert.ok(exactMajors.length >= 2);
 });
 
 test('returns exact matches before related matches across faculties', () => {
@@ -79,7 +80,7 @@ test('returns exact matches before related matches across faculties', () => {
 });
 
 test('returns an empty list when no university offers the major', () => {
-  assert.deepEqual(matchMajorToUniversities('law'), []);
+  assert.deepEqual(matchMajorToUniversities('non_existent_unsupported_major'), []);
   assert.deepEqual(matchMajorToUniversities(''), []);
 });
 
@@ -96,4 +97,13 @@ test('tolerates universities without faculties or majors', () => {
   ];
 
   assert.deepEqual(matchMajorToUniversities('computer_science', fixture), []);
+});
+
+test('filters matches by province', () => {
+  const matches = matchMajorToUniversities('computer_science');
+  const siemReapMatches = matches.filter(m => m.university.province === 'Siem Reap');
+  assert.ok(siemReapMatches.length >= 1);
+
+  const battambangMatches = matches.filter(m => m.university.province === 'Battambang');
+  assert.ok(battambangMatches.length >= 1);
 });

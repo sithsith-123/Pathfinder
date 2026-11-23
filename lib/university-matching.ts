@@ -22,8 +22,11 @@ export interface University {
   name_km: string;
   short_name: string;
   location: string;
+  province?: string;
+  province_km?: string;
   website: string;
   teaching_languages?: string[];
+  ranking?: number;
   faculties?: UniversityFaculty[];
 }
 
@@ -72,9 +75,27 @@ export function matchMajorToUniversities(
   }
 
   matches.sort((a, b) => {
-    if (a.matchType === b.matchType) return 0;
-    return a.matchType === 'exact' ? -1 : 1;
+    if (a.matchType !== b.matchType) {
+      return a.matchType === 'exact' ? -1 : 1;
+    }
+    const rankA = a.university.ranking ?? 99;
+    const rankB = b.university.ranking ?? 99;
+    if (rankA !== rankB) return rankA - rankB;
+    return a.university.name_en.localeCompare(b.university.name_en);
   });
 
   return matches;
+}
+
+export function filterMatchesByProvince(
+  matches: UniversityMatch[],
+  selectedProvince: string,
+): UniversityMatch[] {
+  if (!selectedProvince || selectedProvince === 'all') return matches;
+  return matches.filter(
+    (m) =>
+      m.university.province === selectedProvince ||
+      m.university.province_km === selectedProvince ||
+      m.university.location.toLowerCase().includes(selectedProvince.toLowerCase()),
+  );
 }
